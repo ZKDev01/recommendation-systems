@@ -20,7 +20,7 @@ def intro () -> None:
     '''
   )
 
-def eda () -> None:
+def exploratory_data_analysis () -> None:
   st.write ( '# Exploratory Data Analysis' ) 
   st.markdown(
     '''
@@ -62,9 +62,23 @@ def eda () -> None:
     hide_index=True
   )
 
+  st.write ( 'Analizar la distribucion de los ranking' )
 
+  st.write ( '## See movie' )
+  st.write ( 'Cuando el que use la aplicacion toque un ranking pueda mostrar las peliculas que la persona rankeo y cual es la pelicula, ademas de mostrar un analisis de la persona' )
 
+  st.write ( '## Analisis de la informacion demografica de los usuarios')
+  st.write ( 'Analisis de las edades, sacando el promedio, describe(), distribucion, imagen con un historigrama' )
+  st.write ( 'Lo anterior pero con todos los aspectos de los usuarios, que sean utiles, por ejemplo, con localizacion no hace falta a nuestro entender')
+  # tenemos en la informacion demografica un aspecto pais, si es asi usar un mapa de pais con una grafica de calor para analizar donde viven las personas que rankearon
 
+  st.write ( '## Analisis de la informacion de las peliculas' )
+  st.write ( 'Lo mismo que los usaurios pero con las peliculas' )
+  st.write ( 'Analizar los generos de las peliculas' )
+  st.write ( 'Top peliculas mejor rankeados' )
+  st.write ( 'Top peliculas mejor rankeados por un filter, por ejemplo, misterio' )
+  st.write ( 'Usar LLM con Web Scraping para dar una descripcion de las peliculas con mejor precision' )
+  
 def user_based_cf () -> None:
   st.write ( '# User-based Collaborative Filtering' )
 
@@ -73,7 +87,7 @@ def user_based_cf () -> None:
 def main () -> None:
   page_names_to_funcs = {
     'MAIN': intro,
-    'EDA': eda,
+    'EDA': exploratory_data_analysis,
     'User-based CF': user_based_cf,
     'Item-based CF': None,
     'Content-based F': None,
