@@ -110,10 +110,7 @@ class DataLoader:
       df = df.drop ( columns= [ 'videoReleaseDate', 'IMDbURL' ] )
       return df
 
-  def load_dataset ( self ) -> Dataset:
-    reader = Reader ( rating_scale= ( 1,5 ) )
-    data = Dataset.load_from_df ( self.data_set [ [ 'userID', 'itemID', 'rating' ] ], reader )
-    return data
+
 
   def get_user_by_id ( self, id: int ):
     info = self.user_set.loc [ self.user_set[ 'userID' ] == id ]
@@ -157,8 +154,13 @@ class DataLoader:
     filtered_data = self.data_set.loc [ self.data_set[ column_name ] == id ]
     return filtered_data [ [ 'userID', 'itemID', 'rating' ] ]
   
+  # TODO: todas las peliculas sin clasificar de un usuario
+  def get_all_items_unrating_by_user_id ( self, id: int ) -> pd.DataFrame:
+    pass
 
-
+  # TODO: vecinos cercanos dado features de un nuevo usuario
+  def get_sim_users ( self, features ) -> pd.DataFrame:
+    pass
 
 def test() -> None:
   pass
