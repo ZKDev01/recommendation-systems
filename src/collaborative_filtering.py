@@ -11,7 +11,7 @@ from surprise.model_selection import cross_validate
 
 from pandas import DataFrame
 
-from load_dataset import load_set
+from data_loader import load_set
 
 
 

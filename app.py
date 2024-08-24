@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd 
 import numpy as np  
 
-from src.load_dataset import (
+from data_loader import (
   load_specific_set
 )
 
