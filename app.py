@@ -4,6 +4,15 @@ import numpy as np
 
 from src.data_loader import DataLoader
 
+
+
+def testing_class ( ) -> None:
+  st.write ( '# Testing class' )
+
+
+
+
+
 def intro () -> None: 
   st.write ( '# Recommendation Systems' )
 
@@ -17,6 +26,10 @@ def intro () -> None:
     - Machine Learning based filtering -> Baseline
     '''
   )
+
+
+
+
 
 def exploratory_data_analysis () -> None:
   st.write ( '# Exploratory Data Analysis' ) 
@@ -73,10 +86,19 @@ def exploratory_data_analysis () -> None:
   st.write ( 'Analizar los generos de las peliculas' )
   st.write ( 'Top peliculas mejor rankeados' )
   st.write ( 'Top peliculas mejor rankeados por un filter, por ejemplo, misterio' )
-  st.write ( 'Usar LLM con Web Scraping para dar una descripcion de las peliculas con mejor precision' )
-  
+
+
+
+
+
+
 def user_based_cf () -> None:
   st.write ( '# User-based Collaborative Filtering' )
+
+
+
+
+
 
 
 
