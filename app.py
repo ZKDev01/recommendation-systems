@@ -2,9 +2,7 @@ import streamlit as st
 import pandas as pd 
 import numpy as np  
 
-from data_loader import (
-  load_specific_set
-)
+from src.data_loader import DataLoader
 
 def intro () -> None: 
   st.write ( '# Recommendation Systems' )
@@ -49,11 +47,9 @@ def exploratory_data_analysis () -> None:
     )
   }
   st.write ( '## Rating DataFrame' )
-  df = load_specific_set ( 'RATING' )
-
-  # mmm
-  df.drop ( 'timestamp', axis=1, inplace=True )
-
+  loader = DataLoader ( )
+  df = loader.load_set ( 'DATA' )
+  
   # different al original
   event = st.dataframe ( 
     df,

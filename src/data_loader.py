@@ -26,7 +26,6 @@ from surprise.model_selection import (
 )
 
 
-
 # Movielens data path
 DATA_PATH = 'dataset/data.csv'
 ITEM_PATH = 'dataset/item.csv'
@@ -35,7 +34,10 @@ USER_PATH = 'dataset/user.csv'
 
 class DataLoader: 
   
-  def __init__(self, data_path: str, item_path: str, user_path: str) -> None:
+  def __init__(self, 
+    data_path: str = DATA_PATH, 
+    item_path: str = ITEM_PATH, 
+    user_path: str = USER_PATH) -> None:
     
     self.DATA_PATH = data_path
     self.ITEM_PATH = item_path
