@@ -1,0 +1,15 @@
+
+streamlit==1.35.0
+
+langchain==0.2.0
+langchain-chroma==0.1.1
+langchain-community==0.2.0
+langchain-core==0.2.5
+langchain-google-genai==1.0.4
+
+scikit-surprise==1.1.4
+surprise==0.1
+
+pandas==2.2.2
+numpy==1.26.4
+
