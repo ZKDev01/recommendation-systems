@@ -1,4 +1,5 @@
 from surprise import ( 
+  Prediction,
   accuracy
 ) 
 
@@ -7,7 +8,7 @@ class Metrics:
   """_summary_
   """
   
-  def __init__(self, predictions) -> None:
+  def __init__(self, predictions: list[Prediction]) -> None:
     """_summary_
 
     Args:

@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import streamlit as st
 import pandas as pd 
 import numpy as np  
@@ -11,10 +13,28 @@ from src.model_factory import (
 )
 
 from surprise import ( 
+  Prediction,
   KNNBaseline,
   SVD,
   KNNWithMeans
 )
+
+
+# COGER LA LISTA DE PREDICCIONES Y PASARLA A DATAFRAME A VER QUE PASA
+
+def get_top_n ( predictions: list[Prediction], user_id: int, n: int = 10 ):
+  top_n = defaultdict ( list )
+
+  for element in predictions:
+    if user_id == element.uid:
+      top_n [ user_id ].append ( ( element.iid, element.est ) )
+
+
+  for user_id, user_ratings in top_n.items ( ):
+    user_ratings.sort ( key=lambda x: x[1], reverse=True )
+    top_n [ user_id ] = user_ratings [ :n ]
+
+  return top_n
 
 
 
@@ -73,6 +93,21 @@ def testing_class ( ) -> None:
   metrics.compute_metrics ( 'RMSE', 'MAE' )
 
   st.write ( metrics )
+
+  top_n = get_top_n ( predictions=predictions, user_id=10, n=10 )
+  st.write ( top_n )
+
+
+
+
+
+
+
+
+
+
+
+
 
 def intro () -> None: 
   st.write ( '# Recommendation Systems' )
