@@ -35,3 +35,6 @@ class Metrics:
     """_summary_
     """
     self.metrics [ 'RMSE' ] = accuracy.rmse ( self.predictions ) 
+
+  def __str__(self) -> str:
+    return f'MAE: { self.metrics['MAE'] }\nRMSE: { self.metrics['RMSE'] }'

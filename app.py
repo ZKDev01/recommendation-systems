@@ -3,14 +3,49 @@ import pandas as pd
 import numpy as np  
 
 from src.data_loader import DataLoader
+from src.data_generator import DataGenerator
+from src.metrics import Metrics
+from src.model_factory import (
+  Model,
+  HybridModel_Weighted,
+  Factory
+)
+
+from surprise import ( 
+  KNNBaseline,
+
+
+)
 
 
 
 def testing_class ( ) -> None:
-  st.write ( '# Testing class' )
+  st.write ( '# Clases del proyecto y aplicacion' )
+  st.write ( '## Clase `DataLoader`' )
 
+  data_loader = DataLoader ( )
+  st.write ( type( data_loader ) )
+  
+  st.write ( '## Test sobre Modelos' )
 
+  df_user = data_loader.load_set ( 'DATA' )
 
+  data_generator = DataGenerator (
+    dataframe= df_user
+  )
+  data_generator.from_df_to_dataset()
+  data_generator.train_test_split()
+
+  model_knn_baseline = Model ( 
+    model= KNNBaseline(),
+    name= 'KNN Baseline' 
+  ) 
+  metrics = model_knn_baseline.evaluate ( data=data_generator )
+  metrics.compute_metrics ( 'MAE', 'RMSE' )
+  st.write ( model_knn_baseline )
+  st.write ( metrics )
+  
+  
 
 
 def intro () -> None: 
@@ -104,11 +139,11 @@ def user_based_cf () -> None:
 
 def main () -> None:
   page_names_to_funcs = {
-    'MAIN': intro,
-    'EDA': exploratory_data_analysis,
-    'User-based CF': user_based_cf,
-    'Item-based CF': None,
-    'Content-based F': None,
+    'Principal': intro,
+    'Analisis Exploratorio de Datos': exploratory_data_analysis,
+    'Filtrado Colaborativo Basado en Usuarios': user_based_cf,
+    'Filtrado Colaborativo Basado en Items': None,
+    'Filtrado Basado en Contenido': None,
     'ML based F: Baseline': None
   }
   
@@ -116,7 +151,10 @@ def main () -> None:
   page_names_to_funcs [ deploy ]()
 
 if __name__ == '__main__':
-  main()
+  # main()
+
+  testing_class ( )
+
 
 
 

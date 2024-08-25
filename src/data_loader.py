@@ -1,29 +1,5 @@
-import os
 import numpy as np  
 import pandas as pd
-
-from surprise import ( 
-  Dataset,
-  Reader,
-  accuracy, 
-  SVD,
-  AlgoBase,
-  BaselineOnly,
-  NormalPredictor,
-  KNNBasic,
-  KNNWithMeans,
-  KNNBaseline,
-  KNNWithZScore,
-  SVDpp,
-  NMF,
-  SlopeOne,
-  CoClustering,
-  accuracy
-) 
-
-from surprise.model_selection import (
-  train_test_split
-)
 
 
 # Movielens data path
@@ -48,7 +24,14 @@ class DataLoader:
     self.user_set = self.load_set ( 'USER' )
 
   def load_set (self, name: str ) -> pd.DataFrame:
+    """Esta funcion se encarga de dado una cadena de texto, ya sea: 'DATA', 'USER', 'ITEM' poder retornar el dataset correspondiente 
 
+    Args:
+        name (str): nombre del dataset y puede ser 'DATA', 'USER', 'ITEM'
+
+    Returns:
+        pd.DataFrame: _description_
+    """
     if name == 'DATA':
       columns = [ 'userID', 'itemID', 'rating', 'timestamp' ]
       df = pd.read_csv ( 
@@ -161,10 +144,3 @@ class DataLoader:
   # TODO: vecinos cercanos dado features de un nuevo usuario
   def get_sim_users ( self, features ) -> pd.DataFrame:
     pass
-
-def test() -> None:
-  pass
-
-
-if __name__ == '__main__':
-  test() 

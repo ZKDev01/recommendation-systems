@@ -3,8 +3,8 @@ from surprise import (
   Prediction
 )
 
-from metrics import Metrics
-from data_generator import DataGenerator
+from src.metrics import Metrics
+from src.data_generator import DataGenerator
 
 
 class Model: 
@@ -15,18 +15,14 @@ class Model:
 
 
   def __str__(self) -> str:
-    output = f"""
-    Name Model:             { self.name } 
-    Model:                  { self.model }
-    Is the Model fit?       { self.is_fit }
-    """
+    output = f"Name Model:       { self.name } \nModel:            { self.model }\nIs the Model fit? { self.is_fit }"
     return output
   
 
 
   def fit ( self, data: DataGenerator ) -> AlgoBase:
     
-    trainset = data.get_trainset ( )
+    trainset, _ = data.get_train_test_set ( )
     fit_model = self.model.fit ( trainset )
 
     self.is_fit = True
@@ -37,7 +33,7 @@ class Model:
   def evaluate ( self, data: DataGenerator ) -> Metrics: 
     fit_model = self.fit ( data )
     
-    testset = data.get_testset ( )
+    _, testset = data.get_train_test_set ( )
     predictions = fit_model.test ( testset )
 
     return Metrics ( predictions )
@@ -108,8 +104,3 @@ class Factory:
 
 
 
-def test ( ) -> None:
-  pass
-
-if __name__ == '__main__':
-  test ( )

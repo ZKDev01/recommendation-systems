@@ -17,7 +17,7 @@ class DataGenerator:
 
 
   def train_test_split ( self ) -> None:    
-
+    
     self.trainset, self.testset = train_test_split ( 
       data=self.dataset,
       test_size=self.percentage,
@@ -33,19 +33,8 @@ class DataGenerator:
 
 
   def get_train_test_set ( self ) -> Any:
-
     return self.trainset, self.testset 
 
-
-
-
-def test ( ) -> None:  
-  print ( '======= Testing =======' )
-  
-  pass
-
-if __name__ == '__main__':
-  test ( )
 
 
 
