@@ -48,9 +48,10 @@ class Model:
 # sistema de recomendacion hibrido modelo paralelo metodo weighted
 class HybridModel_Weighted ( AlgoBase ):
 
-  def __init__ (self, models: list[ Model ], weights: list[ float ], **kwargs):
+  def __init__ (self, name: str, models: list[ Model ], weights: list[ float ], **kwargs):
 
     super().__init__(**kwargs) 
+    self.name = name
     self.models = models
     self.weights = weights
   
@@ -77,30 +78,11 @@ class HybridModel_Weighted ( AlgoBase ):
       scores += weight_k * estimated_rating
 
     return scores
-
-
-
-
-# Esta clase funciona tanto para pobrar las metricas en diferentes modelos, como para hacer predicciones
-class Factory:
-  def __init__(self, data_generator: DataGenerator, models: list [ Model ]) -> None:
-    self.dataset = data_generator
-    self.models = models
   
-  def add_model ( self, model: Model ) -> None:
-    self.models.append ( model )
-  
-  
-  def clean_models ( self ) -> None:
-    self.models = [] 
 
+  def __str__(self) -> str:
+    return self.name
 
-  # TODO
-  def evaluate ( self ) -> None:
-    results = { }
-    for model in self.models:
-      print ( f'Evaluating { model.name }' )
-      results [ model.name ] = model.evaluate( self.dataset )
 
 
 

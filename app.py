@@ -7,14 +7,13 @@ from src.data_generator import DataGenerator
 from src.metrics import Metrics
 from src.model_factory import (
   Model,
-  HybridModel_Weighted,
-  Factory
+  HybridModel_Weighted
 )
 
 from surprise import ( 
   KNNBaseline,
-
-
+  SVD,
+  KNNWithMeans
 )
 
 
@@ -45,8 +44,35 @@ def testing_class ( ) -> None:
   st.write ( model_knn_baseline )
   st.write ( metrics )
   
-  
+  model_svd = Model (
+    model= SVD(),
+    name= 'SVD'
+  )
 
+  metrics = model_svd.evaluate ( data=data_generator )
+  metrics.compute_metrics ( 'MAE', 'RMSE' )
+  st.write ( model_svd )
+  st.write ( metrics )
+
+  # Test Hybrid Model Class
+  hybrid = HybridModel_Weighted (
+    name= ' SVD x KNN with Means ', 
+    models= [ 
+      Model ( model=SVD(), name='SVD' ),
+      Model ( model=KNNWithMeans( sim_options= { 'name': 'cosine', 'user_based': False } ), name='KNN with Means' ) ], 
+    weights= [ 0.5, 0.5 ] )
+
+  st.write ( hybrid )
+  
+  _, testset = data_generator.get_train_test_set ( )
+  
+  hybrid.fit ( data_generator=data_generator )
+  predictions = hybrid.test ( testset )
+
+  metrics = Metrics ( predictions=predictions )
+  metrics.compute_metrics ( 'RMSE', 'MAE' )
+
+  st.write ( metrics )
 
 def intro () -> None: 
   st.write ( '# Recommendation Systems' )
