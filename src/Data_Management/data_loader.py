@@ -234,13 +234,49 @@ class DataLoader_TMDB:
   def get_movies_dataset ( self ) -> pd.DataFrame:
     return self.movies
 
-  def preprocessing_set ( self ) -> None:
+  def preprocessing_set ( self, verbose: bool = False ) -> None:
+    # type checking: params 
+    if not isinstance( verbose, bool ):
+      raise TypeError( "Param 'verbose' must be boolean" )
+
     # 1. cargamos el dataframe para el preprocesamiento (por si antes se trabajo de forma malintencionada o si se ejecuta el codigo por segunda vez)
     self.load_set ( )
 
     # 2. empezar con el preprocesamiento
-    movies = self.movies.merge ( self.credit, on='title' )
+    
+    # merge the both datasets
+    merge = self.movies.merge ( self.credit, on='title' )
+    
+    # check the missing values ( only show if verbose is True )
+    if verbose:
+      print ( f'Before: Missing Values: { merge.isnull().sum().sum() }' )
 
+    # =================================================
+    print ( "Remove 'homepage', 'tagline' columns and fillup the missing values in the columns" )
+
+    # remove homepage, tagline columns
+    merge = merge.drop ( ['homepage', 'tagline'], axis=1 )
+
+    # fillup the missing values in the columns
+    merge[ 'overview' ] = merge[ 'overview' ].fillna( '' )
+    merge[ 'release_date' ] = merge[ 'release_date' ].fillna( '' )
+    merge[ 'runtime' ] = merge[ 'runtime' ].fillna( '' )
+
+    if verbose: 
+      print ( f'After: Missing Values: { merge.isnull().sum().sum() }' )
+    # check the missing values again
+    
+    # Convert the budget and revenue column in millons 
+    merge[ 'budget' ]  = merge[ 'budget' ]  / 1_000_000
+    merge[ 'budget' ]  = merge[ 'budget' ].astype ( int )
+
+    merge[ 'revenue' ] = merge[ 'revenue' ] / 1_000_000
+    merge[ 'revenue' ] = merge[ 'revenue' ].astype ( int )
+    
+    print ( merge[ 'budget' ] )
+
+
+    self.preprocess_set = merge
 
 if __name__ == '__main__':
   dl_tmdb = DataLoader_TMDB ( )
@@ -248,3 +284,6 @@ if __name__ == '__main__':
   print ( df )
   df = dl_tmdb.get_credit_dataset ( )
   print ( df )
+
+  dl_tmdb.preprocessing_set ( verbose=True )
+
