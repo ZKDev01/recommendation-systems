@@ -4,13 +4,6 @@ import streamlit as st
 import pandas as pd 
 import numpy as np  
 
-from src.Data_Management.data_loader import DataLoader_Movielens
-
-from src.Recommendation_Model_Analysis.data_generator import DataGenerator
-from src.Recommendation_Model_Analysis.metrics import Metrics
-from src.Recommendation_Model_Analysis.model_factory import Model, HybridModel_Weighted
-
-
 from surprise import ( 
   Prediction,
   KNNBaseline,
@@ -19,25 +12,25 @@ from surprise import (
 )
 
 
-# COGER LA LISTA DE PREDICCIONES Y PASARLA A DATAFRAME A VER QUE PASA
 
-def get_top_n ( predictions: list[Prediction], user_id: int, n: int = 10 ):
-  top_n = defaultdict ( list )
+from src.Data_Management.data_loader import DataLoader_Movielens
 
-  for element in predictions:
-    if user_id == element.uid:
-      top_n [ user_id ].append ( ( element.iid, element.est ) )
+from src.Recommendation_Model_Analysis.data_generator import DataGenerator
+from src.Recommendation_Model_Analysis.metrics import Metrics
+from src.Recommendation_Model_Analysis.model_factory import Model, HybridModel_Weighted
+from src.Recommendation_Model_Analysis.utils import (
+  get_top_n,
+
+)
 
 
-  for user_id, user_ratings in top_n.items ( ):
-    user_ratings.sort ( key=lambda x: x[1], reverse=True )
-    top_n [ user_id ] = user_ratings [ :n ]
-
-  return top_n
 
 
 
 def testing_class ( ) -> None:
+  """_summary_
+  """
+
   st.write ( '# Clases del proyecto y aplicacion' )
   st.write ( '## Clase `DataLoader`' )
 
@@ -109,6 +102,10 @@ def testing_class ( ) -> None:
 
 
 def intro () -> None: 
+  """Presentacion del proyecto
+  """
+
+
   st.write ( '# Recommendation Systems' )
 
   st.markdown(
@@ -127,6 +124,8 @@ def intro () -> None:
 
 
 def exploratory_data_analysis () -> None:
+  """
+  """
   st.write ( '# Exploratory Data Analysis' ) 
   st.markdown(
     '''

@@ -137,3 +137,11 @@ class DataLoader_Movielens:
     filtered_data = self.data_set.loc [ self.data_set[ column_name ] == id ]
     return filtered_data [ [ 'userID', 'itemID', 'rating' ] ]
   
+
+
+
+
+
+class DataLoader_TMDB:
+  pass
+
