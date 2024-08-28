@@ -126,6 +126,9 @@ def intro () -> None:
 def exploratory_data_analysis () -> None:
   """
   """
+
+  dl_movielens = DataLoader_Movielens ()
+  dl_movielens.load_set() 
   st.write ( '# Exploratory Data Analysis' ) 
   st.markdown(
     '''
@@ -210,9 +213,9 @@ def main () -> None:
   page_names_to_funcs [ deploy ]()
 
 if __name__ == '__main__':
-  # main()
+  main()
 
-  testing_class ( )
+  # testing_class ( )
 
 
 

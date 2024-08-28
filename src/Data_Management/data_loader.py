@@ -24,13 +24,17 @@ class DataLoader_Movielens:
     self.user_set = self.load_set ( 'USER' )
 
   def load_set (self, name: str ) -> pd.DataFrame:
-    """Esta funcion se encarga de dado una cadena de texto, ya sea: 'DATA', 'USER', 'ITEM' poder retornar el dataset correspondiente 
+    """
+    Carga el conjunto de datos correspondiente al nombre proporcionado.
 
     Args:
-        name (str): nombre del dataset y puede ser 'DATA', 'USER', 'ITEM'
+        name (str) -> Nombre del conjunto de datos (puede ser: 'DATA', 'USER', o 'ITEM')
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame -> El conjunto de datos cargado como DataFrame
+
+    Raises:
+        ValueError -> Si el nombre no corresponde a 'DATA', 'USER', o 'ITEM'
     """
 
     if name == 'DATA':
@@ -94,88 +98,113 @@ class DataLoader_Movielens:
       df = df.drop ( columns= [ 'videoReleaseDate', 'IMDbURL' ] )
       return df
 
+    raise ValueError ( "El nombre no corresponde a 'DATA', 'USER', o 'ITEM'" )
 
-
-  def get_user_by_id ( self, id: int ):
-    """_summary_
-
-    Args:
-        id (int): _description_
-
-    Returns:
-        _type_: _description_
+  def get_user_by_id ( self, id: int ) -> dict:
     """
-
-    info = self.user_set.loc [ self.user_set[ 'userID' ] == id ]
-    return info[ [ 'userID', 'age', 'gender', 'occupation' ] ].iloc[0].to_dict()
-
-
-  def get_item_by_id ( self, id: int ):
-    """_summary_
+    Obtiene información de un usuario por su ID.
 
     Args:
-        id (int): _description_
+        id (int) -> ID del usuario
 
     Returns:
-        _type_: _description_
+        dict -> Información del usuario como diccionario con campos 'userID', 'age', 'gender' y 'occupation'
+
+    Raises:
+        KeyError -> Si el usuario no se encuentra en la base de datos
     """
-    info = self.item_set.loc [ self.item_set[ 'itemID' ] == id ]
-    return info[ [ 
-      'itemID', 
-      'name', 
-      'releaseDate', 
-      'gender_unknown', 
-      'gender_action', 
-      'gender_adventure', 
-      'gender_animation', 
-      'gender_children', 
-      'gender_comedy',
-      'gender_crime',
-      'gender_documentary',
-      'gender_drama',
-      'gender_fantasy',
-      'gender_film_noir',
-      'gender_horror',
-      'gender_musical',
-      'gender_mystery',
-      'gender_romance',
-      'gender_scifi',
-      'gender_thriller',
-      'gender_war',
-      'gender_western', ] ].iloc[0].to_dict()
+    try:
+      info = self.user_set.loc [ self.user_set[ 'userID' ] == id ]
+      return info[ [ 'userID', 'age', 'gender', 'occupation' ] ].iloc[0].to_dict()
+    
+    except KeyError:
+      raise KeyError ( 'El usuario no se encuentra en la base de datos' )
 
 
-  def get_rating_by_ids ( self, user_id: int, item_id: int ):
-    """_summary_
+  def get_item_by_id ( self, id: int ) -> dict:
+    """
+    Obtiene información del item por su ID.
 
     Args:
-        user_id (int): _description_
-        item_id (int): _description_
+        id (int) -> El identificador único del item.
 
     Returns:
-        _type_: _description_
+        dict -> Un diccionario conteniendo detalles del item incluyendo 'itemID', 'name',
+                'releaseDate', y diversas categorías de género.
+
+    Raises:
+        KeyError -> Si no se encuentra ningún item que coincida con el ID proporcionado.
+    """
+    try:
+      info = self.item_set.loc [ self.item_set[ 'itemID' ] == id ]
+      return info[ [ 
+        'itemID', 
+        'name', 
+        'releaseDate', 
+        'gender_unknown', 
+        'gender_action', 
+        'gender_adventure', 
+        'gender_animation', 
+        'gender_children', 
+        'gender_comedy',
+        'gender_crime',
+        'gender_documentary',
+        'gender_drama',
+        'gender_fantasy',
+        'gender_film_noir',
+        'gender_horror',
+        'gender_musical',
+        'gender_mystery',
+        'gender_romance',
+        'gender_scifi',
+        'gender_thriller',
+        'gender_war',
+        'gender_western', ] ].iloc[0].to_dict()
+    except KeyError:
+      raise KeyError ( 'No se encuentra ningún item que coincida con el ID proporcionado' )
+    
+
+
+  def get_rating_by_ids ( self, user_id: int, item_id: int ) -> int:
+    """
+    Obtiene la calificación del usuario por el ID del item correspondiente.
+
+    Args:
+        user_id (int) -> El ID del usuario.
+        item_id (int) -> El ID del item.
+
+    Returns:
+        int -> La calificación del usuario para el item especificado.
+
+    Raises:
+        Exception -> Si falla al recuperar la calificación.
     """
     try:
       rating = self.data_set.loc [ self.data_set[ 'userID' ] == user_id ].loc [ self.data_set[ 'itemID' ] == item_id ]
-      return ( rating.iloc[0]['rating'], True )
+      return rating.iloc[0]['rating']
     except:
-      # Failed to retrieve the rating
-      return ( -1, False )
+      raise Exception ( 'Fallo al recuperar la calificación' )
 
 
-  def get_ratings_by_name_id ( self, column_name: str, id: int ):
-    """_summary_
+  def get_ratings_by_name_id ( self, column_name: str, id: int ) -> pd.DataFrame:
+    """
+    Filtra los datos del conjunto de ratings por el nombre de la columna y el valor del ID proporcionado.
 
     Args:
-        column_name (str): _description_
-        id (int): _description_
+        column_name (str) -> El nombre de la columna para filtrar.
+        id (int) -> El valor del ID para filtrar.
 
     Returns:
-        _type_: _description_
+        pd.DataFrame -> Un DataFrame conteniendo solo las filas donde la columna especificada coincide con el valor del ID.
+
+    Raises:
+        Exception -> Si falla al recuperar la infomración.
     """
-    filtered_data = self.data_set.loc [ self.data_set[ column_name ] == id ]
-    return filtered_data [ [ 'userID', 'itemID', 'rating' ] ]
-  
+    try:
+      filtered_data = self.data_set.loc [ self.data_set[ column_name ] == id ]
+      return filtered_data [ [ 'userID', 'itemID', 'rating' ] ]
+    except:
+      raise Exception ( 'Fallo al recuperar la información' )
 
 
 
