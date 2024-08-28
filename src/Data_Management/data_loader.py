@@ -32,6 +32,7 @@ class DataLoader_Movielens:
     Returns:
         pd.DataFrame: _description_
     """
+
     if name == 'DATA':
       columns = [ 'userID', 'itemID', 'rating', 'timestamp' ]
       df = pd.read_csv ( 
@@ -96,10 +97,28 @@ class DataLoader_Movielens:
 
 
   def get_user_by_id ( self, id: int ):
+    """_summary_
+
+    Args:
+        id (int): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     info = self.user_set.loc [ self.user_set[ 'userID' ] == id ]
     return info[ [ 'userID', 'age', 'gender', 'occupation' ] ].iloc[0].to_dict()
 
+
   def get_item_by_id ( self, id: int ):
+    """_summary_
+
+    Args:
+        id (int): _description_
+
+    Returns:
+        _type_: _description_
+    """
     info = self.item_set.loc [ self.item_set[ 'itemID' ] == id ]
     return info[ [ 
       'itemID', 
@@ -125,7 +144,17 @@ class DataLoader_Movielens:
       'gender_war',
       'gender_western', ] ].iloc[0].to_dict()
 
+
   def get_rating_by_ids ( self, user_id: int, item_id: int ):
+    """_summary_
+
+    Args:
+        user_id (int): _description_
+        item_id (int): _description_
+
+    Returns:
+        _type_: _description_
+    """
     try:
       rating = self.data_set.loc [ self.data_set[ 'userID' ] == user_id ].loc [ self.data_set[ 'itemID' ] == item_id ]
       return ( rating.iloc[0]['rating'], True )
@@ -133,7 +162,17 @@ class DataLoader_Movielens:
       # Failed to retrieve the rating
       return ( -1, False )
 
+
   def get_ratings_by_name_id ( self, column_name: str, id: int ):
+    """_summary_
+
+    Args:
+        column_name (str): _description_
+        id (int): _description_
+
+    Returns:
+        _type_: _description_
+    """
     filtered_data = self.data_set.loc [ self.data_set[ column_name ] == id ]
     return filtered_data [ [ 'userID', 'itemID', 'rating' ] ]
   
