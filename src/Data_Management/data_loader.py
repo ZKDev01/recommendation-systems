@@ -7,6 +7,10 @@ MOVIELENS_DATA_PATH = 'dataset/movielens_data.csv'
 MOVIELENS_ITEM_PATH = 'dataset/movielens_item.csv'
 MOVIELENS_USER_PATH = 'dataset/movielens_user.csv'
 
+# TMDB data path
+TMDB_CREDIT = 'dataset/tmdb_5000_credit.csv'
+TMDB_MOVIES = 'dataset/tmdb_5000_movies.csv'
+
 
 class DataLoader_Movielens: 
   
@@ -23,7 +27,7 @@ class DataLoader_Movielens:
     self.item_set = self.load_set ( 'ITEM' )
     self.user_set = self.load_set ( 'USER' )
 
-  def load_set (self, name: str ) -> pd.DataFrame:
+  def load_set ( self, name: str ) -> pd.DataFrame:
     """
     Carga el conjunto de datos correspondiente al nombre proporcionado.
 
@@ -211,5 +215,36 @@ class DataLoader_Movielens:
 
 
 class DataLoader_TMDB:
-  pass
+  def __init__(self, 
+    credit_path: str = TMDB_CREDIT, 
+    movies_path: str = TMDB_MOVIES ) -> None:
+    
+    self.CREDIT_PATH = credit_path
+    self.MOVIES_PATH = movies_path
 
+    self.load_set ( )
+
+  def load_set ( self ) -> None:
+    self.credit = pd.read_csv ( self.CREDIT_PATH )
+    self.movies = pd.read_csv ( self.MOVIES_PATH )
+    
+  def get_credit_dataset ( self ) -> pd.DataFrame:
+    return self.credit
+  
+  def get_movies_dataset ( self ) -> pd.DataFrame:
+    return self.movies
+
+  def preprocessing_set ( self ) -> None:
+    # 1. cargamos el dataframe para el preprocesamiento (por si antes se trabajo de forma malintencionada o si se ejecuta el codigo por segunda vez)
+    self.load_set ( )
+
+    # 2. empezar con el preprocesamiento
+    movies = self.movies.merge ( self.credit, on='title' )
+
+
+if __name__ == '__main__':
+  dl_tmdb = DataLoader_TMDB ( )
+  df = dl_tmdb.get_movies_dataset ( )
+  print ( df )
+  df = dl_tmdb.get_credit_dataset ( )
+  print ( df )
