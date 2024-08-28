@@ -4,13 +4,12 @@ import streamlit as st
 import pandas as pd 
 import numpy as np  
 
-from src.data_loader import DataLoader
-from src.data_generator import DataGenerator
-from src.metrics import Metrics
-from src.model_factory import (
-  Model,
-  HybridModel_Weighted
-)
+from src.Data_Management.data_loader import DataLoader_Movielens
+
+from src.Recommendation_Model_Analysis.data_generator import DataGenerator
+from src.Recommendation_Model_Analysis.metrics import Metrics
+from src.Recommendation_Model_Analysis.model_factory import Model, HybridModel_Weighted
+
 
 from surprise import ( 
   Prediction,
@@ -42,7 +41,7 @@ def testing_class ( ) -> None:
   st.write ( '# Clases del proyecto y aplicacion' )
   st.write ( '## Clase `DataLoader`' )
 
-  data_loader = DataLoader ( )
+  data_loader = DataLoader_Movielens ( )
   st.write ( type( data_loader ) )
   
   st.write ( '## Test sobre Modelos' )
@@ -156,7 +155,7 @@ def exploratory_data_analysis () -> None:
     )
   }
   st.write ( '## Rating DataFrame' )
-  loader = DataLoader ( )
+  loader = DataLoader_Movielens ( )
   df = loader.load_set ( 'DATA' )
   
   # different al original

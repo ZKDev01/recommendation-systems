@@ -3,17 +3,17 @@ import pandas as pd
 
 
 # Movielens data path
-DATA_PATH = 'dataset/data.csv'
-ITEM_PATH = 'dataset/item.csv'
-USER_PATH = 'dataset/user.csv'
+MOVIELENS_DATA_PATH = 'dataset/movielens_data.csv'
+MOVIELENS_ITEM_PATH = 'dataset/movielens_item.csv'
+MOVIELENS_USER_PATH = 'dataset/movielens_user.csv'
 
 
-class DataLoader: 
+class DataLoader_Movielens: 
   
   def __init__(self, 
-    data_path: str = DATA_PATH, 
-    item_path: str = ITEM_PATH, 
-    user_path: str = USER_PATH) -> None:
+    data_path: str = MOVIELENS_DATA_PATH, 
+    item_path: str = MOVIELENS_ITEM_PATH, 
+    user_path: str = MOVIELENS_USER_PATH) -> None:
     
     self.DATA_PATH = data_path
     self.ITEM_PATH = item_path
@@ -137,10 +137,3 @@ class DataLoader:
     filtered_data = self.data_set.loc [ self.data_set[ column_name ] == id ]
     return filtered_data [ [ 'userID', 'itemID', 'rating' ] ]
   
-  # TODO: todas las peliculas sin clasificar de un usuario
-  def get_all_items_unrating_by_user_id ( self, id: int ) -> pd.DataFrame:
-    pass
-
-  # TODO: vecinos cercanos dado features de un nuevo usuario
-  def get_sim_users ( self, features ) -> pd.DataFrame:
-    pass

@@ -3,8 +3,8 @@ from surprise import (
   Prediction
 )
 
-from src.metrics import Metrics
-from src.data_generator import DataGenerator
+from src.Recommendation_Model_Analysis.metrics import Metrics
+from src.Recommendation_Model_Analysis.data_generator import DataGenerator
 
 
 class Model: 
