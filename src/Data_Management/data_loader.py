@@ -1,6 +1,19 @@
 import numpy as np  
 import pandas as pd
 
+try: 
+  from src.Data_Management.utils import (
+    convert,
+    convert_3,
+    director
+  ) 
+except:
+  from utils import (
+    convert,
+    convert_3,
+    director
+  )
+
 
 # Movielens data path
 MOVIELENS_DATA_PATH = 'dataset/movielens_data.csv'
@@ -222,7 +235,7 @@ class DataLoader_TMDB:
     self.CREDIT_PATH = credit_path
     self.MOVIES_PATH = movies_path
 
-    self.load_set ( )
+    self.preprocessing_set( )
 
   def load_set ( self ) -> None:
     self.credit = pd.read_csv ( self.CREDIT_PATH )
@@ -249,11 +262,11 @@ class DataLoader_TMDB:
     
     # check the missing values ( only show if verbose is True )
     if verbose:
-      print ( f'Before: Missing Values: { merge.isnull().sum().sum() }' )
+      print ( f'\nBefore: Missing Values: { merge.isnull().sum().sum() }' )
+      print ( "... Fillup the missing values in the columns" )
 
     # =================================================
-    print ( "Remove 'homepage', 'tagline' columns and fillup the missing values in the columns" )
-
+    
     # remove homepage, tagline columns
     merge = merge.drop ( ['homepage', 'tagline'], axis=1 )
 
@@ -272,18 +285,94 @@ class DataLoader_TMDB:
 
     merge[ 'revenue' ] = merge[ 'revenue' ] / 1_000_000
     merge[ 'revenue' ] = merge[ 'revenue' ].astype ( int )
+
     
-    print ( merge[ 'budget' ] )
+    if verbose:
+      print ( "After: Convert the 'budget' and 'revenue' column in millons" )
+      print ( merge[ 'budget' ].head( 10 ) )
+      print ( '\n\n' )
+      print ( "Movies with highest 'budget'" )
+      # print ( '\n' )
+      print ( merge[ ['title', 'budget', 'revenue'] ].sort_values ( 'budget', ascending=False ).head( 10 ) )
+      print ( '\n\n' )
+      print ( "Movies with highest 'revenue'" )
+      # print ( '\n' )
+      print ( merge[ ['title', 'budget', 'revenue'] ].sort_values ( 'revenue', ascending=False ).head( 10 ) )
+    
+    merge = merge[ [ 
+      'id',
+      'title',
+      'overview',
+      'genres',
+      'keywords',
+      'cast',
+      'crew',
+      'budget',
+      'revenue'
+    ]]
+    
+    if verbose: 
+      print ( '\n\n', merge.head( 10 ) )
 
+    # Processing columns
+    ## GENRES
 
-    self.preprocess_set = merge
+    if verbose:
+      print ( '\n\nProcessing columns: GENRES' )
+      print ( merge[ 'genres' ].head( 10 ) )
+
+    merge[ 'genres' ] = merge[ 'genres' ].apply ( convert )
+
+    if verbose:
+      print ( '\n\nResults: GENRES' )
+      print ( merge[ ['title', 'genres'] ].head( 10 ) )
+
+    ## KEYWORDS
+
+    if verbose:
+      print ( '\n\nProcessing columns: KEYWORDS' )
+      print ( merge[ 'keywords' ].head( 10 ) )
+
+    merge[ 'keywords' ] = merge[ 'keywords' ].apply ( convert )
+
+    if verbose:
+      print ( '\n\nResults: KEYWORDS' )
+      print ( merge[['title', 'keywords']].head( 10 ) )
+
+    ## CAST
+
+    if verbose:
+      print ( '\n\nProcessing columns: CAST' )
+      print ( merge[ 'cast' ].head( 10 ) )
+      
+    merge[ 'cast' ] = merge[ 'cast' ].apply ( convert_3 )
+
+    if verbose:
+      print ( '\n\nResults: CAST' )
+      print ( merge[['title', 'cast']].head( 10 ) )
+
+    ## CREW
+
+    if verbose:
+      print ( '\n\nProcessing columns: CREW' )
+      print ( merge[ 'crew' ].head( 10 ) )
+      
+    merge[ 'crew' ] = merge[ 'crew' ].apply ( director )
+
+    if verbose:
+      print ( '\n\nResults: CREW' )
+      print ( merge[['title', 'crew']].head( 10 ) )
+
+    self.preprocessed_set = merge
+
+  
 
 if __name__ == '__main__':
   dl_tmdb = DataLoader_TMDB ( )
   df = dl_tmdb.get_movies_dataset ( )
-  print ( df )
+  #print ( df.head( 10 ) )
   df = dl_tmdb.get_credit_dataset ( )
-  print ( df )
+  #print ( df.head( 10 ) )
 
   dl_tmdb.preprocessing_set ( verbose=True )
 
