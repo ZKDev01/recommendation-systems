@@ -81,7 +81,7 @@ def get_counts_of_movies_by_original_language ( df_credit: pd.DataFrame, df_movi
   Returns:
       pd.Series[int]: _description_
   """
-  
+
   df_merge = df_movies.merge ( df_credit, on='title' )
   return df_merge [ 'original_language' ].value_counts( )
 
@@ -102,7 +102,3 @@ def get_top_K_of_movies ( merge: pd.DataFrame, columns: list[str] = [ 'title', '
   result = merge[ columns ].sort_values ( column, ascending=ascending )
   return result.head( K )
 
-
-def get_top_K_of_movies_with_hightest_revenue ( ) -> None:
-
-  pass  
