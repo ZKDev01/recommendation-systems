@@ -18,7 +18,12 @@ from src.Data_Management.data_loader import (
   DataLoader_TMDB
 )
 from src.Data_Management.exploratory_data_analysis import (
+
   get_dataframe_from_data_set_group_by_rating,
+  calculate_sim_matrix,
+  get_gender_counts_from_data_set
+
+
 )
 
 from src.Recommendation_Model_Analysis.data_generator import DataGenerator

@@ -72,23 +72,37 @@ def statistic_about_ratings ( ) :
 
 # cambiar el nombre
 def get_counts_of_movies_by_original_language ( df_credit: pd.DataFrame, df_movies: pd.DataFrame ) -> pd.Series[int]:
+  """_summary_
+
+  Args:
+      df_credit (pd.DataFrame): _description_
+      df_movies (pd.DataFrame): _description_
+
+  Returns:
+      pd.Series[int]: _description_
+  """
+  
   df_merge = df_movies.merge ( df_credit, on='title' )
   return df_merge [ 'original_language' ].value_counts( )
 
-def xxxxxx ( ) -> None:
-  """ 
-    
-    if verbose:
-      print ( "After: Convert the 'budget' and 'revenue' column in millons" )
-      print ( merge[ 'budget' ].head( 10 ) )
-      print ( '\n\n' )
-      print ( "Movies with highest 'budget'" )
-      # print ( '\n' )
-      print ( merge[ ['title', 'budget', 'revenue'] ].sort_values ( 'budget', ascending=False ).head( 10 ) )
-      print ( '\n\n' )
-      print ( "Movies with highest 'revenue'" )
-      # print ( '\n' )
-      print ( merge[ ['title', 'budget', 'revenue'] ].sort_values ( 'revenue', ascending=False ).head( 10 ) )
-    
+def get_top_K_of_movies ( merge: pd.DataFrame, columns: list[str] = [ 'title', 'budget', 'revenue' ], column: str = 'budget', K: int = 10, ascending: bool = False ) -> pd.DataFrame:
+  """_summary_
+
+  Args:
+      merge (pd.DataFrame): _description_
+      columns (list[str], optional): _description_. Defaults to [ 'title', 'budget', 'revenue' ].
+      column (str, optional): _description_. Defaults to 'budget'.
+      K (int, optional): _description_. Defaults to 10.
+      ascending (bool, optional): _description_. Defaults to False.
+
+  Returns:
+      pd.DataFrame: _description_
   """
-  pass
+
+  result = merge[ columns ].sort_values ( column, ascending=ascending )
+  return result.head( K )
+
+
+def get_top_K_of_movies_with_hightest_revenue ( ) -> None:
+
+  pass  
