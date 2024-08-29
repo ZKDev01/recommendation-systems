@@ -26,3 +26,13 @@ def director ( obj ) -> list:
       L.append ( i['name'] )
       break
   return L
+
+
+def row_process ( row, columns: list[ str ] ) -> list[ str ]:
+  
+  result = [ ]
+  
+  for column in columns: 
+    if row[ column ] == 1:
+      result.append ( column )
+  return result

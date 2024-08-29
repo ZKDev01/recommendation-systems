@@ -1,18 +1,12 @@
 import numpy as np  
 import pandas as pd
 
-try: 
-  from src.Data_Management.utils import (
+from src.Data_Management.utils import (
     convert,
     convert_3,
-    director
-  ) 
-except:
-  from utils import (
-    convert,
-    convert_3,
-    director
-  )
+    director,
+    row_process
+)
 
 
 # Movielens data path
@@ -223,8 +217,44 @@ class DataLoader_Movielens:
     except:
       raise Exception ( 'Fallo al recuperar la información' )
 
+  def get_merge_by_item_ids ( self ) -> pd.DataFrame:
+    """
+    """
+    
+    auxiliar_set = self.item_set
+    auxiliar_set = auxiliar_set.drop ( [ 'releaseDate', 'name' ], axis=1 )
 
+    columns = [ 
+      'gender_unknown', 
+      'gender_action', 
+      'gender_adventure', 
+      'gender_animation', 
+      'gender_children', 
+      'gender_comedy',
+      'gender_crime',
+      'gender_documentary',
+      'gender_drama',
+      'gender_fantasy',
+      'gender_film_noir',
+      'gender_horror',
+      'gender_musical',
+      'gender_mystery',
+      'gender_romance',
+      'gender_scifi',
+      'gender_thriller',
+      'gender_war',
+      'gender_western'
+    ]
 
+    auxiliar_set [ 'genders' ] = auxiliar_set.apply ( lambda row: row_process( row, columns=columns ), axis=1 )
+    auxiliar_set = auxiliar_set.drop ( columns=columns, axis=1 )
+
+    tmp_item_set = self.item_set.merge( right=auxiliar_set, how='inner', left_on='itemID', right_on='itemID' )
+    tmp_item_set = tmp_item_set.drop ( columns=columns, axis=1 )
+
+    merge = self.data_set.merge ( right=tmp_item_set, how='inner', left_on='itemID', right_on='itemID' )
+    
+    return merge [  merge [ 'name' ] != 'unknown' ]
 
 
 class DataLoader_TMDB:
@@ -246,6 +276,9 @@ class DataLoader_TMDB:
   
   def get_movies_dataset ( self ) -> pd.DataFrame:
     return self.movies
+
+
+
 
   def preprocessing_set ( self, verbose: bool = False ) -> None:
     # type checking: params 
@@ -279,13 +312,7 @@ class DataLoader_TMDB:
       print ( f'After: Missing Values: { merge.isnull().sum().sum() }' )
     # check the missing values again
     
-    # Convert the budget and revenue column in millons 
-    merge[ 'budget' ]  = merge[ 'budget' ]  / 1_000_000
-    merge[ 'budget' ]  = merge[ 'budget' ].astype ( int )
-
-    merge[ 'revenue' ] = merge[ 'revenue' ] / 1_000_000
-    merge[ 'revenue' ] = merge[ 'revenue' ].astype ( int )
-
+    """ 
     
     if verbose:
       print ( "After: Convert the 'budget' and 'revenue' column in millons" )
@@ -299,6 +326,8 @@ class DataLoader_TMDB:
       # print ( '\n' )
       print ( merge[ ['title', 'budget', 'revenue'] ].sort_values ( 'revenue', ascending=False ).head( 10 ) )
     
+    """
+
     merge = merge[ [ 
       'id',
       'title',
@@ -363,16 +392,28 @@ class DataLoader_TMDB:
       print ( '\n\nResults: CREW' )
       print ( merge[['title', 'crew']].head( 10 ) )
 
-    self.preprocessed_set = merge
+    self.preprocessed_set = merge.rename ( columns={ 
+      'title' : 'titulo',
+      'overview' : 'resumen',
+      'cast' : 'actores',
+      'genres' : 'genders',
+      'crew' : 'director',
+      'budget' : 'presupuesto',
+      'revenue' : 'ingresos' 
+    } )
 
-  
 
-if __name__ == '__main__':
-  dl_tmdb = DataLoader_TMDB ( )
-  df = dl_tmdb.get_movies_dataset ( )
-  #print ( df.head( 10 ) )
-  df = dl_tmdb.get_credit_dataset ( )
-  #print ( df.head( 10 ) )
 
-  dl_tmdb.preprocessing_set ( verbose=True )
+
+  def get_preprocessed_set ( self ) -> pd.DataFrame:
+    return self.preprocessed_set
+
+
+
+  def convert_preprocessed_set_to_list ( self ) -> list[ str ]:
+    list_movies = self.get_preprocessed_set ( ).values.tolist( )
+    return list_movies
+    
+
+
 

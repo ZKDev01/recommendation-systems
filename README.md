@@ -1,10 +1,5 @@
 # recommendation-systems
 
-
-para docstring: 
-
-
-
 ## Descripción del repositorio
 
 ## Requerimientos 
@@ -12,6 +7,8 @@ para docstring:
 ## Setup Guide
 
 ## Descripcion de la base de datos
+
+### MovieLens 
 
 Los conjuntos de datos de MovieLens fueron recopilados por el Proyecto de Investigación GroupLens en la Universidad de Minnesota. 
 
@@ -27,6 +24,8 @@ Este conjunto de datos ha sido limpiado: se eliminaron los usuarios que tenían 
 | --- | --- | 
 | u.info | El número de usuarios, items y valoraciones en el conjunto de datos u |
 | u.item | Información sobre los items (películas). Esta lista está separada por tabulaciones de: id de la película, título de la película, ... |
+
+### TMDB 5000 Movies 
 
 ## Autores
 
