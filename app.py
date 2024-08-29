@@ -17,6 +17,9 @@ from src.Data_Management.data_loader import (
   DataLoader_Movielens,
   DataLoader_TMDB
 )
+from src.Data_Management.exploratory_data_analysis import (
+  get_dataframe_from_data_set_group_by_rating,
+)
 
 from src.Recommendation_Model_Analysis.data_generator import DataGenerator
 from src.Recommendation_Model_Analysis.metrics import Metrics
@@ -208,12 +211,16 @@ def exploratory_data_analysis ( ) -> None:
   '''
   ## Análisis Exploratorio de Datos
 
+  El propósito del análsiis exploratorio es tener una idea completa de cómo son nuestros datos, antes de decidir qué técnica usar. Y como en la práctica los datos no son ideales, debemos organizarlos, entender su contenido, entender cuáles son las variables más relevantes y cómo se relacionan unas con otras, comenzar a ver algunos patrones, determinar qué hacer con los datos faltantes y con los datos atípicos, y finalmente extraer conclusiones acerca de todo este análisis. 
+
+
   ''' )
 
   # load dataset 
   dl_movielens = DataLoader_Movielens ( )
   dl_tmdb = DataLoader_TMDB ( )
   
+  # merge dataset of movielens 
   merge_movilens = dl_movielens.get_merge_by_item_ids ( )
 
   st.markdown ( 
@@ -230,6 +237,7 @@ def exploratory_data_analysis ( ) -> None:
   (analisis exploratorio de datos para el dataset de movielens)
   ''' )
 
+  # preprocessed set of tmdb 
   preprocessed_set = dl_tmdb.get_preprocessed_set ( )
   
   st.markdown ( 

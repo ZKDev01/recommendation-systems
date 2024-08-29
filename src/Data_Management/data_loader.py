@@ -220,7 +220,7 @@ class DataLoader_Movielens:
   def get_merge_by_item_ids ( self ) -> pd.DataFrame:
     """
     """
-    
+
     auxiliar_set = self.item_set
     auxiliar_set = auxiliar_set.drop ( [ 'releaseDate', 'name' ], axis=1 )
 
@@ -311,22 +311,6 @@ class DataLoader_TMDB:
     if verbose: 
       print ( f'After: Missing Values: { merge.isnull().sum().sum() }' )
     # check the missing values again
-    
-    """ 
-    
-    if verbose:
-      print ( "After: Convert the 'budget' and 'revenue' column in millons" )
-      print ( merge[ 'budget' ].head( 10 ) )
-      print ( '\n\n' )
-      print ( "Movies with highest 'budget'" )
-      # print ( '\n' )
-      print ( merge[ ['title', 'budget', 'revenue'] ].sort_values ( 'budget', ascending=False ).head( 10 ) )
-      print ( '\n\n' )
-      print ( "Movies with highest 'revenue'" )
-      # print ( '\n' )
-      print ( merge[ ['title', 'budget', 'revenue'] ].sort_values ( 'revenue', ascending=False ).head( 10 ) )
-    
-    """
 
     merge = merge[ [ 
       'id',
