@@ -34,20 +34,38 @@ class Faiss_Vectorstore:
       )
     else:
       
-      """ 
-      ERROR POR LA CANTIDAD DE ELEMENTOS DE CHUNKS (debe ser por eso)
-      self.__vs = FAISS.from_documents(
-        documents=movies,
-        embedding=embedding
-      )
-      """
-
       movies_like_documents: List[ Document ] = [ Document(movie) for movie in movies ] 
 
-      self.__vectorstore = FAISS.from_documents ( 
-        documents=movies_like_documents[0:10],
+      # Problema con la carga de peliculas 
+      movies_like_documents = movies_like_documents[0:499]
+
+      self.__vectorstore = FAISS.from_documents (
+        documents=movies_like_documents[0 : 99],
         embedding=embedding
       )
+
+
+      for i in range ( 1, 5 ):
+        extension = FAISS.from_documents ( 
+          documents=movies_like_documents[i*100 : i*100+99],
+          embedding=embedding
+        )
+        self.__vectorstore.merge_from ( extension )
+      
+
+      """ 
+      # SE DEMORA MUCHO ESTO
+      counter = 1
+      for item in movies_like_documents:
+        
+        extension = FAISS.from_documents (
+          documents=[ item ],
+          embedding=embedding
+        )
+        self.__vectorstore.merge_from ( extension )
+        print ( counter )
+        counter += 1
+      """
 
 
   def similarity_search ( self, query: str, k: int = 10 ) -> list[str]:
