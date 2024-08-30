@@ -11,6 +11,7 @@ from surprise import (
   KNNWithMeans
 )
 
+import matplotlib.pyplot as plt
 
 
 from src.Data_Management.data_loader import (
@@ -18,12 +19,13 @@ from src.Data_Management.data_loader import (
   DataLoader_TMDB
 )
 from src.Data_Management.exploratory_data_analysis import (
+  count_ratings_by_gender,
+  count_user_ratings,
+  get_top_K_movies,
+  count_people_by_age,
 
-  get_dataframe_from_data_set_group_by_rating,
-  calculate_sim_matrix,
-  get_gender_counts_from_data_set
-
-
+  count_movies_by_original_language, 
+  top_K_movies_by_column
 )
 
 from src.Recommendation_Model_Analysis.data_generator import DataGenerator
@@ -102,97 +104,6 @@ def testing_class ( ) -> None:
 
 
 
-
-
-
-
-
-
-def not_data_management ( ) -> None:
-
-  st.write ( '# Dataset: TMDB 5000 Movies' )
-  
-  tmdb = DataLoader_TMDB ( )
-  df = tmdb.get_preprocessed_set ( )
-
-  # st.write ( tmdb.convert_preprocessed_set_to_list ( )[ 0 ] )
-  st.write ( df )
-      
-
-
-
-
-
-
-def not_exploratory_data_analysis () -> None:
-  """
-  """
-
-  dl_movielens = DataLoader_Movielens ()
-  dl_movielens.load_set() 
-  st.write ( '# Exploratory Data Analysis' ) 
-  st.markdown(
-    '''
-    En esta seccion va a estar el Analisis Exploratorio de Datos
-    '''
-  )
-
-  columns_configuration = {
-    'userID': st.column_config.TextColumn(
-      'UserID',
-      help='ID del usuario',
-      max_chars=100,
-      width='medium'
-    ),
-    'itemID': st.column_config.TextColumn(
-      'ItemID',
-      help='ID del item',
-      max_chars=100,
-      width='medium'
-    ),
-    'rating': st.column_config.TextColumn(
-      'Rating',
-      help='Rating de la pelicula por el usuario',
-      max_chars=100,
-      width='medium'
-    )
-  }
-  st.write ( '## Rating DataFrame' )
-  loader = DataLoader_Movielens ( )
-  df = loader.load_set ( 'DATA' )
-  
-  # different al original
-  event = st.dataframe ( 
-    df,
-    column_config=columns_configuration,
-    use_container_width=True,
-    hide_index=True
-  )
-
-  st.write ( 'Analizar la distribucion de los ranking' )
-
-  st.write ( '## See movie' )
-  st.write ( 'Cuando el que use la aplicacion toque un ranking pueda mostrar las peliculas que la persona rankeo y cual es la pelicula, ademas de mostrar un analisis de la persona' )
-
-  st.write ( '## Analisis de la informacion demografica de los usuarios')
-  st.write ( 'Analisis de las edades, sacando el promedio, describe(), distribucion, imagen con un historigrama' )
-  st.write ( 'Lo anterior pero con todos los aspectos de los usuarios, que sean utiles, por ejemplo, con localizacion no hace falta a nuestro entender')
-  # tenemos en la informacion demografica un aspecto pais, si es asi usar un mapa de pais con una grafica de calor para analizar donde viven las personas que rankearon
-
-  st.write ( '## Analisis de la informacion de las peliculas' )
-  st.write ( 'Lo mismo que los usaurios pero con las peliculas' )
-  st.write ( 'Analizar los generos de las peliculas' )
-  st.write ( 'Top peliculas mejor rankeados' )
-  st.write ( 'Top peliculas mejor rankeados por un filter, por ejemplo, misterio' )
-
-
-
-
-
-
-
-
-
 def home ( ) -> None:
   """
   
@@ -225,8 +136,11 @@ def exploratory_data_analysis ( ) -> None:
   dl_movielens = DataLoader_Movielens ( )
   dl_tmdb = DataLoader_TMDB ( )
   
-  # merge dataset of movielens 
+  # merge dataset of movielens and other dataset
   merge_movilens = dl_movielens.get_merge_by_item_ids ( )
+  data_set = dl_movielens.data_set
+  user_set = dl_movielens.user_set
+  item_set = dl_movielens.item_set
 
   st.markdown ( 
   '''
@@ -237,14 +151,48 @@ def exploratory_data_analysis ( ) -> None:
 
   st.write ( merge_movilens )
   
+  # ========================================================================================================
   st.markdown ( 
   '''
-  (analisis exploratorio de datos para el dataset de movielens)
+  Grafica de Generos de las personas que calificaron
   ''' )
+  gender_counts = count_ratings_by_gender ( df=user_set )
 
-  # preprocessed set of tmdb 
-  preprocessed_set = dl_tmdb.get_preprocessed_set ( )
+  labels = 'M', 'F'
+  sizes = ( gender_counts.iloc[0], gender_counts.iloc[1] )
+
+  fig, ax = plt.subplots( )
+  ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=['blue', 'red'])
+
+  st.pyplot ( fig )
+
+  # default values
+  grouped = count_user_ratings ( df=data_set, head=10, ascending=True )
+  st.write ( grouped )
+
+  # ascending = False
+  grouped = count_user_ratings ( df=data_set, head=10, ascending=False )
+  st.write ( grouped )
+
+  # ascending = True, but head = -1 (return fullset)
+  grouped = count_user_ratings ( df=data_set, head=-1, ascending=True )
+  st.write ( grouped )
   
+  grouped = get_top_K_movies ( df=data_set )
+  st.write ( grouped )
+
+  grouped = count_people_by_age ( df=user_set )
+  st.write ( grouped )
+  
+  # ========================================================================================================
+
+  # preprocessed set of tmdb and other
+  preprocessed_set = dl_tmdb.get_preprocessed_set ( )
+  movies_set = dl_tmdb.get_movies_dataset ( )
+  credit_set = dl_tmdb.get_credit_dataset ( )
+  
+  merge = movies_set.merge ( credit_set, on='title' )
+
   st.markdown ( 
   '''
   ### Conjunto de Datos de TMDB 5000 Movies
@@ -253,6 +201,17 @@ def exploratory_data_analysis ( ) -> None:
   ''' )
   
   st.write ( preprocessed_set )
+
+  results = count_movies_by_original_language ( merge ).head ( 15 )
+  st.write ( results )
+
+  results = top_K_movies_by_column ( merge, column='budget', ascending=False, K=10 )
+  st.write ( results )
+
+  results = top_K_movies_by_column ( merge, column='revenue', ascending=False, K=10 )
+  st.write ( results )
+  
+  # ==============================================================
 
 
 def recommendation_models ( ) -> None:
@@ -274,8 +233,6 @@ def llm_assistant ( ) -> None:
   
   Un LLM es un modelo generativo ...
   ''')
-
-
 
 
 
