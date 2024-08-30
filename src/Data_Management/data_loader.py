@@ -5,8 +5,12 @@ from src.Data_Management.utils import (
     convert,
     convert_3,
     director,
-    row_process
+    row_process, 
+    row_to_string
 )
+
+from typing import List
+
 
 
 # Movielens data path
@@ -394,10 +398,11 @@ class DataLoader_TMDB:
 
 
 
-  def convert_preprocessed_set_to_list ( self ) -> list[ str ]:
-    list_movies = self.get_preprocessed_set ( ).values.tolist( )
-    return list_movies
+  def convert_preprocessed_set_to_list ( self ) -> List[ str ]:
+    list_movies: List[ str ] = self.get_preprocessed_set ( ).values.tolist( )
+    auxiliar_set = self.get_preprocessed_set ( )
+    auxiliar_set [ 'text' ] = auxiliar_set.apply ( lambda row: row_to_string ( row, columns=auxiliar_set.columns ), axis=1 )
     
-
-
+    return auxiliar_set [ 'text' ].values.tolist ( )
+  
 

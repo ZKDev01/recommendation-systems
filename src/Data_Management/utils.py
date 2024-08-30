@@ -36,3 +36,14 @@ def row_process ( row, columns: list[ str ] ) -> list[ str ]:
     if row[ column ] == 1:
       result.append ( column )
   return result
+
+
+def row_to_string ( row, columns: list[ str ] ) -> str:
+
+  result = ''
+
+  for col in columns:
+    result += col + ' : ' + str(row[col]) + '\n'
+  
+  return result
+

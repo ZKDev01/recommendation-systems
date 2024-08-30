@@ -33,74 +33,13 @@ from src.Recommendation_Model_Analysis.metrics import Metrics
 from src.Recommendation_Model_Analysis.model_factory import Model, HybridModel_Weighted
 from src.Recommendation_Model_Analysis.utils import (
   get_top_n,
-
+  get_evaluation_and_comparison_of_machine_learning_models
 )
 
 
+from src.LLM.vectorstore import Faiss_Vectorstore
 
 
-
-def testing_class ( ) -> None:
-  """_summary_
-  """
-
-  st.write ( '# Clases del proyecto y aplicacion' )
-  st.write ( '## Clase `DataLoader`' )
-
-  data_loader = DataLoader_Movielens ( )
-  st.write ( type( data_loader ) )
-  
-  st.write ( '## Test sobre Modelos' )
-
-  df_user = data_loader.load_set ( 'DATA' )
-
-  data_generator = DataGenerator (
-    dataframe= df_user
-  )
-  data_generator.from_df_to_dataset()
-  data_generator.train_test_split()
-
-  model_knn_baseline = Model ( 
-    model= KNNBaseline(),
-    name= 'KNN Baseline' 
-  ) 
-  metrics = model_knn_baseline.evaluate ( data=data_generator )
-  metrics.compute_metrics ( 'MAE', 'RMSE' )
-  st.write ( model_knn_baseline )
-  st.write ( metrics )
-  
-  model_svd = Model (
-    model= SVD(),
-    name= 'SVD'
-  )
-
-  metrics = model_svd.evaluate ( data=data_generator )
-  metrics.compute_metrics ( 'MAE', 'RMSE' )
-  st.write ( model_svd )
-  st.write ( metrics )
-
-  # Test Hybrid Model Class
-  hybrid = HybridModel_Weighted (
-    name= ' SVD x KNN with Means ', 
-    models= [ 
-      Model ( model=SVD(), name='SVD' ),
-      Model ( model=KNNWithMeans( sim_options= { 'name': 'cosine', 'user_based': False } ), name='KNN with Means' ) ], 
-    weights= [ 0.5, 0.5 ] )
-
-  st.write ( hybrid )
-  
-  _, testset = data_generator.get_train_test_set ( )
-  
-  hybrid.fit ( data_generator=data_generator )
-  predictions = hybrid.test ( testset )
-
-  metrics = Metrics ( predictions=predictions )
-  metrics.compute_metrics ( 'RMSE', 'MAE' )
-
-  st.write ( metrics )
-
-  top_n = get_top_n ( predictions=predictions, user_id=10, n=10 )
-  st.write ( top_n )
 
 
 
@@ -214,12 +153,106 @@ def exploratory_data_analysis ( ) -> None:
   # ==============================================================
 
 
+
+
+
 def recommendation_models ( ) -> None:
   """ 
   
   """
   
-  pass
+  st.markdown ( 
+  '''
+  ## Modelos de Recomendación
+
+  
+
+  '''
+  )
+
+  dl_movielens = DataLoader_Movielens ( )
+  data_set = dl_movielens.data_set
+
+  data_generator = DataGenerator ( 
+    dataframe=data_set
+  )
+  data_generator.from_df_to_dataset()
+  data_generator.train_test_split()
+
+  st.markdown (  
+  '''
+  ### Comparación y Evaluación de los Diferentes Modelos provistos por Surprise
+  ''')  
+  results = get_evaluation_and_comparison_of_machine_learning_models( data_set )
+
+  st.write ( results )
+  
+  st.markdown (  
+  '''
+  Analizando los modelos KNN Baseline y SVD 'clasico'
+  ''')
+
+  model_knn_baseline = Model ( 
+    model=KNNBaseline(),
+    name='KNN Baseline'
+  )
+  metrics = model_knn_baseline.evaluate ( data=data_generator )
+  metrics.compute_metrics ( 'MAE', 'RMSE' )
+
+  st.write ( '===============================' )
+  st.write ( model_knn_baseline )
+  st.write ( metrics )
+  
+  model_svd = Model (
+    model=SVD(),
+    name='SVD'
+  )
+  metrics = model_svd.evaluate ( data=data_generator )
+  metrics.compute_metrics ( 'MAE', 'RMSE' )
+
+  st.write ( '===============================' )
+  st.write ( model_svd )
+  st.write ( metrics )
+
+  st.markdown (  
+  '''
+  ### Sistema de Recomendación Híbrido  
+  '''
+  )
+
+  hybrid_model = HybridModel_Weighted (
+    name='SVD x KNN with Means',
+    models=[
+      Model(
+        model=SVD(),
+        name='SVD'
+      ),
+      Model(
+        model=KNNWithMeans ( sim_options= { 'name': 'cosine', 'user_based': False } ),
+        name='KNN with Means'
+      )
+    ],
+    weights=[0.5,0.5]
+  )
+
+  st.write ( hybrid_model )
+  
+  _, testset = data_generator.get_train_test_set ( )
+  hybrid_model.fit ( data_generator )
+  predictions = hybrid_model.test ( testset )
+
+  metrics = Metrics ( predictions=predictions )
+  metrics.compute_metrics ( 'RMSE', 'MAE' )
+
+  st.write ( metrics )
+
+  # PEDIR AL USUARIO QUE INSERTE UN USER_ID 
+  top_n = get_top_n ( predictions=predictions, user_id=10, n=10 )
+  st.write ( top_n )
+
+
+
+
 
 def llm_assistant ( ) -> None:
   """ 
@@ -233,6 +266,16 @@ def llm_assistant ( ) -> None:
   
   Un LLM es un modelo generativo ...
   ''')
+
+  dl_tmdb = DataLoader_TMDB ( )
+  movies_list = dl_tmdb.convert_preprocessed_set_to_list ( )
+
+  # st.write( movies_list[0] )
+
+  faiss = Faiss_Vectorstore ( movies_list, load=False )
+
+  sim_result = faiss.similarity_search ( 'Peliculas de no-accion', k=10 )
+  st.write ( sim_result )
 
 
 

@@ -117,3 +117,8 @@ def prompt_template_QA(question: str, k: int, model: GoogleGenerativeAI) -> str:
     })
   return result
 
+
+
+
+
+
