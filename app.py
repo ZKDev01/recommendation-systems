@@ -27,7 +27,8 @@ from src.Data_Management.exploratory_data_analysis import (
   count_movies_by_original_language, 
   top_K_movies_by_column,
   count_movies_by_genders,
-  count_movies_by_genders_list
+  count_movies_by_genders_list,
+  get_movies_by_genders
 )
 
 from src.Recommendation_Model_Analysis.data_generator import DataGenerator
@@ -39,8 +40,13 @@ from src.Recommendation_Model_Analysis.utils import (
 )
 
 
-from src.LLM.vectorstore import Faiss_Vectorstore
-
+from src.LLM.vectorstore import (
+  Faiss_Vectorstore,
+  Personalized_Vectorstores
+)
+from src.LLM.chat_history import (
+  ChatHistory
+)
 
 
 
@@ -160,7 +166,10 @@ def exploratory_data_analysis ( ) -> None:
 
   # ==============================================================
 
-
+  results = get_movies_by_genders ( preprocessed_set, genders )
+  for i in genders:
+    st.write ( i )
+    st.write ( results [ i ] )
 
 
 
@@ -276,17 +285,59 @@ def llm_assistant ( ) -> None:
   ''')
 
   dl_tmdb = DataLoader_TMDB ( )
-  movies_list = dl_tmdb.convert_preprocessed_set_to_list ( )
+  # movies_list = dl_tmdb.convert_preprocessed_set_to_list ( )
 
   # st.write( movies_list[0] )
 
-  faiss = Faiss_Vectorstore ( movies_list, load=False )
+  # faiss = Faiss_Vectorstore ( movies_list, load=False )
 
-  sim_result = faiss.similarity_search ( 'Peliculas de no-accion', k=10 )
-  st.write ( sim_result )
+  # sim_result = faiss.similarity_search ( 'Peliculas de no-accion', k=10 )
+  # st.write ( sim_result )
 
 
+  preprocessed_set = dl_tmdb.get_preprocessed_set ( )
+  
+  genders = dl_tmdb.get_genders_list ( )
+  # st.write ( genders )
 
+  results = count_movies_by_genders_list ( preprocessed_set, genders )
+  # st.write ( results )
+  
+  movies: dict = get_movies_by_genders ( preprocessed_set, genders )
+  
+  for i in genders:
+    movies[ i ] = dl_tmdb.convert_preprocessed_set_to_list( dataframe=movies[ i ] )
+
+
+  # st.write ( movies['Action'] )
+
+  vectorstore : list[ Faiss_Vectorstore ] = [ ]
+
+  for i in genders:
+    if results[i] <= 100:
+      vectorstore.append ( Faiss_Vectorstore ( 
+        movies=movies[ i ], 
+        description=i
+      ) )
+    else:
+      vectorstore.append ( Faiss_Vectorstore (
+        movies=movies[ i ][ 0:100 ],
+        description=i
+      ) )
+
+  st.write ( 'BUSQUEDA POR SIMILITUD FINAL' )
+
+  #individual = vectorstore[0]
+  #st.write ( individual.similarity_search( 'Action', 10 ) )
+
+  personalized_vs = Personalized_Vectorstores ( vectorstore )
+  results = personalized_vs.similarity_search ( 'Action', 5 )
+  st.write ( len(results) )
+  llm_with_history_chat = ChatHistory (  )
+  llm_with_history_chat.make_chain()
+  response = llm_with_history_chat.to_answer_query( query='Recomiendame 10 peliculas de accion', movies=results )
+
+  st.write ( response )
 
 
 

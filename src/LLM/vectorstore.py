@@ -14,9 +14,10 @@ FAISS_PATH = os.getcwd() + '\\database\\faiss'
 
 class Faiss_Vectorstore:
 
-  def __init__(self, movies: List[str], load: bool = False) -> None:
+  def __init__(self, movies: List[str], description: str) -> None:
     """
     Inicializa una instancia de `Faiss_Vectorstore` para manejar y buscar en una base de datos vectorial de FAISS
+
 
     Este constructor permite opcionalmente cargar la base de datos vectorial existente si se pasa `True` al parametro `load`. 
     Si `load` es `False` (valor predeterminado), se crea una nueva base de datos vectorial con la listra proporcionada
@@ -26,46 +27,15 @@ class Faiss_Vectorstore:
     """
     embedding = get_embedding()
 
-    if load:
-      self.__vectorstore = FAISS.load_local( 
-        folder_path=FAISS_PATH,
-        embeddings=embedding,
-        allow_dangerous_deserialization=True
-      )
-    else:
-      
-      movies_like_documents: List[ Document ] = [ Document(movie) for movie in movies ] 
+    movies_like_documents: List[ Document ] = [ Document(movie) for movie in movies ]
 
-      # Problema con la carga de peliculas 
-      movies_like_documents = movies_like_documents[0:499]
+    self.__vectorstore = FAISS.from_documents ( 
+      documents=movies_like_documents,
+      embedding=embedding
+    )
 
-      self.__vectorstore = FAISS.from_documents (
-        documents=movies_like_documents[0 : 99],
-        embedding=embedding
-      )
-
-
-      for i in range ( 1, 5 ):
-        extension = FAISS.from_documents ( 
-          documents=movies_like_documents[i*100 : i*100+99],
-          embedding=embedding
-        )
-        self.__vectorstore.merge_from ( extension )
-      
-
-      """ 
-      # SE DEMORA MUCHO ESTO
-      counter = 1
-      for item in movies_like_documents:
-        
-        extension = FAISS.from_documents (
-          documents=[ item ],
-          embedding=embedding
-        )
-        self.__vectorstore.merge_from ( extension )
-        print ( counter )
-        counter += 1
-      """
+  def __str__(self) -> str:
+    return ''
 
 
   def similarity_search ( self, query: str, k: int = 10 ) -> list[str]:
@@ -84,4 +54,22 @@ class Faiss_Vectorstore:
     results = self.__vectorstore.similarity_search ( query=query, k=k )
     results = [ r.page_content for r in results ]
     return results
+
+
+class Personalized_Vectorstores:
+  def __init__(self, faiss_vectorstores: list[ Faiss_Vectorstore ]) -> None:
+    self.vectorstores = faiss_vectorstores
+
+  def similarity_search ( self, query: str, k: int = 10 ) -> list[ str ]:
+
+    if not k > 0:
+      raise Exception ( 'El parametro k no puede ser negativo ni 0' )
+    
+    results = [ ]
+    for vs in self.vectorstores:
+      result_tmp = vs.similarity_search ( query=query, k=k )
+      results += result_tmp
+
+    return results
+
 

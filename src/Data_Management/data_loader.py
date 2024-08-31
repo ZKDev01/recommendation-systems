@@ -399,12 +399,12 @@ class DataLoader_TMDB:
 
 
 
-  def convert_preprocessed_set_to_list ( self ) -> List[ str ]:
+  def convert_preprocessed_set_to_list ( self, dataframe: pd.DataFrame ) -> List[ str ]:
     # list_movies: List[ str ] = self.get_preprocessed_set ( ).values.tolist( )
-    auxiliar_set = self.get_preprocessed_set ( )
-    auxiliar_set [ 'text' ] = auxiliar_set.apply ( lambda row: row_to_string ( row, columns=auxiliar_set.columns ), axis=1 )
+    # auxiliar_set = self.get_preprocessed_set ( )
+    dataframe [ 'text' ] = dataframe.apply ( lambda row: row_to_string ( row, columns=dataframe.columns ), axis=1 )
     
-    return auxiliar_set [ 'text' ].values.tolist ( )
+    return dataframe [ 'text' ].values.tolist ( )
 
   def get_features ( self ) -> List[ str ]: 
     """ 
