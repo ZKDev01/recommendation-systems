@@ -25,7 +25,9 @@ from src.Data_Management.exploratory_data_analysis import (
   count_people_by_age,
 
   count_movies_by_original_language, 
-  top_K_movies_by_column
+  top_K_movies_by_column,
+  count_movies_by_genders,
+  count_movies_by_genders_list
 )
 
 from src.Recommendation_Model_Analysis.data_generator import DataGenerator
@@ -150,6 +152,12 @@ def exploratory_data_analysis ( ) -> None:
   results = top_K_movies_by_column ( merge, column='revenue', ascending=False, K=10 )
   st.write ( results )
   
+  genders = dl_tmdb.get_genders_list ( )
+  st.write ( genders )
+
+  results = count_movies_by_genders_list ( preprocessed_set, genders )
+  st.write ( results )
+
   # ==============================================================
 
 

@@ -10,6 +10,7 @@ from src.Data_Management.utils import (
 )
 
 from typing import List
+from itertools import chain
 
 
 
@@ -399,10 +400,20 @@ class DataLoader_TMDB:
 
 
   def convert_preprocessed_set_to_list ( self ) -> List[ str ]:
-    list_movies: List[ str ] = self.get_preprocessed_set ( ).values.tolist( )
+    # list_movies: List[ str ] = self.get_preprocessed_set ( ).values.tolist( )
     auxiliar_set = self.get_preprocessed_set ( )
     auxiliar_set [ 'text' ] = auxiliar_set.apply ( lambda row: row_to_string ( row, columns=auxiliar_set.columns ), axis=1 )
     
     return auxiliar_set [ 'text' ].values.tolist ( )
-  
 
+  def get_features ( self ) -> List[ str ]: 
+    """ 
+    
+    """
+    return [ ]
+
+  def get_genders_list ( self ) -> List[ str ]:
+    unique_genders = list ( set( chain( *self.get_preprocessed_set()['genders'].tolist() ) ) )
+    return unique_genders
+  
+  

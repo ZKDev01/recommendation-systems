@@ -113,4 +113,22 @@ def top_K_movies_by_column ( merge: pd.DataFrame, column: str, ascending: bool =
   results = merge[ [ 'title', 'budget', 'revenue' ] ].sort_values ( column, ascending=ascending )
   return results if K == -1 else results.head( K )
 
+def count_movies_by_genders ( merge: pd.DataFrame, target: str ) -> int:
+  """_summary_
 
+  Args:
+      merge (pd.DataFrame): _description_
+
+  Returns:
+      pd.Series: _description_
+  """
+  def contains_gender ( genders_list: list[str] ):
+    return target in genders_list
+
+  return merge [ 'genders' ].apply( contains_gender ).sum( )
+
+def count_movies_by_genders_list ( merge: pd.DataFrame, genders: list[str] ) -> Any:
+  result = { }
+  for gender in genders:
+    result[ gender ] = count_movies_by_genders ( merge, gender )
+  return result
