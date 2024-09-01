@@ -26,14 +26,16 @@ from src.Data_Management.exploratory_data_analysis import (
 
   count_movies_by_original_language, 
   top_K_movies_by_column,
-  count_movies_by_genders,
   count_movies_by_genders_list,
   get_movies_by_genders
 )
 
 from src.Recommendation_Model_Analysis.data_generator import DataGenerator
 from src.Recommendation_Model_Analysis.metrics import Metrics
-from src.Recommendation_Model_Analysis.model_factory import Model, HybridModel_Weighted
+from src.Recommendation_Model_Analysis.model_factory import (
+  Model, 
+  HybridModel_Weighted
+)
 from src.Recommendation_Model_Analysis.utils import (
   get_top_n,
   get_evaluation_and_comparison_of_machine_learning_models
@@ -131,9 +133,6 @@ def exploratory_data_analysis ( ) -> None:
   grouped = count_people_by_age ( df=user_set )
   st.write ( grouped )
   
-  # ========================================================================================================
-
-  # preprocessed set of tmdb and other
   preprocessed_set = dl_tmdb.get_preprocessed_set ( )
   movies_set = dl_tmdb.get_movies_dataset ( )
   credit_set = dl_tmdb.get_credit_dataset ( )
@@ -163,8 +162,6 @@ def exploratory_data_analysis ( ) -> None:
 
   results = count_movies_by_genders_list ( preprocessed_set, genders )
   st.write ( results )
-
-  # ==============================================================
 
   results = get_movies_by_genders ( preprocessed_set, genders )
   for i in genders:
@@ -276,41 +273,24 @@ def llm_assistant ( ) -> None:
   
   """
   
-  st.markdown ( '''
-  ## Sistema de Recomendación usando LLM
-  
-  ### Qué es un LLM?
-  
-  Un LLM es un modelo generativo ...
-  ''')
-
+  # cargar tmdb-dataset
   dl_tmdb = DataLoader_TMDB ( )
-  # movies_list = dl_tmdb.convert_preprocessed_set_to_list ( )
-
-  # st.write( movies_list[0] )
-
-  # faiss = Faiss_Vectorstore ( movies_list, load=False )
-
-  # sim_result = faiss.similarity_search ( 'Peliculas de no-accion', k=10 )
-  # st.write ( sim_result )
-
-
+  
+  # obtener el conjunto de datos preprocesado 
   preprocessed_set = dl_tmdb.get_preprocessed_set ( )
   
+  # obtener la lista de generos para filtrar con el conjunto de datos preprocesado 
   genders = dl_tmdb.get_genders_list ( )
-  # st.write ( genders )
-
-  results = count_movies_by_genders_list ( preprocessed_set, genders )
-  # st.write ( results )
   
+  # obtenemos las peliculas separadas por generos 
+  results = count_movies_by_genders_list ( preprocessed_set, genders )
   movies: dict = get_movies_by_genders ( preprocessed_set, genders )
   
+  # obtenemos por cada tupla del dataframe una cadena de texto
   for i in genders:
     movies[ i ] = dl_tmdb.convert_preprocessed_set_to_list( dataframe=movies[ i ] )
 
-
-  # st.write ( movies['Action'] )
-
+  # aqui estaran almacenadas las bases de datos vectoriales (cada una correspondera a un genero) 
   vectorstore : list[ Faiss_Vectorstore ] = [ ]
 
   for i in genders:
@@ -325,20 +305,45 @@ def llm_assistant ( ) -> None:
         description=i
       ) )
 
-  st.write ( 'BUSQUEDA POR SIMILITUD FINAL' )
-
-  #individual = vectorstore[0]
-  #st.write ( individual.similarity_search( 'Action', 10 ) )
-
-  personalized_vs = Personalized_Vectorstores ( vectorstore )
-  results = personalized_vs.similarity_search ( 'Action', 5 )
-  st.write ( len(results) )
+  # finalmente tenemos un objeto que contiene todas las bases de datos vectoriales
+  personalized_vs = Personalized_Vectorstores ( vectorstore )  
+  # y otro que usa el LLM para generar las respuesta/recomendaciones y con la característica de chat-history
   llm_with_history_chat = ChatHistory (  )
   llm_with_history_chat.make_chain()
+
+  # results = personalized_vs.similarity_search ( 'Action', 5 )
+
+  
   response = llm_with_history_chat.to_answer_query( query='Recomiendame 10 peliculas de accion', movies=results )
 
-  st.write ( response )
+  st.write ( '## RecSys using RAG' )
+  # Initialize chat history
+  if "messages" not in st.session_state:
+    st.session_state.messages = []
 
+  # Display chat messages from history on app rerun
+  for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+      st.markdown(message["content"])
+
+  # React to user input
+  if prompt := st.chat_input("What is up?"):
+    # Display user message in chat message container
+    st.chat_message("user").markdown(prompt)
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+    # MAGIC HERE
+    results_of_similarity_search = personalized_vs.similarity_search ( prompt, 5 )
+    
+    prompt = llm_with_history_chat.to_answer_query ( query=prompt, movies=results_of_similarity_search )
+
+    response = f"IA: {prompt}"
+    # Display assistant response in chat message container
+    with st.chat_message("assistant"):
+      st.markdown(response)
+    # Add assistant response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": response})
 
 
 
@@ -380,6 +385,8 @@ def main () -> None:
   page_names_to_funcs [ deploy ]()
 
 if __name__ == '__main__':
+
+  # chats ( )
   main ( )
 
 
