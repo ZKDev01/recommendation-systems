@@ -1,6 +1,8 @@
-# recommendation-systems
+# Sistemas de Recomendación
 
 ## Descripción del repositorio
+
+Es un proyecto para la asignatura de Sistemas de Recuperación de Información. Este proyecto abarca de conceptos básicos de los sistemas de recomendación como los sistemas de recomendación de filtrado colaborativo basado en items hasta una implementación de sistema de recomendación usando RAG y LLM  
 
 ## Requerimientos 
 
@@ -28,5 +30,7 @@ Este conjunto de datos ha sido limpiado: se eliminaron los usuarios que tenían 
 ### TMDB 5000 Movies 
 
 ## Autores
+
+
 
 

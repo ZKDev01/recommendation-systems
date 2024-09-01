@@ -65,6 +65,9 @@ def home ( ) -> None:
   
   ''')
 
+  st.image("assets/image-1.png", caption="Foto generada por Canva")
+
+
 
 
 def exploratory_data_analysis ( ) -> None:
@@ -270,9 +273,27 @@ def recommendation_models ( ) -> None:
 
 def llm_assistant ( ) -> None:
   """ 
+  Función principal para implementar un asistente de recomendación de películas utilizando un LLM y 
+  búsqueda de similitud vectorial. 
+
+  Esta función realiza las siguientes tareas:
+
+  1. Carga y preprocesa el conjunto de datos de películas de TMDB.
+  2. Crea bases de datos vectoriales personalizadas para cada género de película 
+  3. Inicializa un chat con historial utilizando un LLM
+  4. Implementa una interfaz de usuario en Streamlit para interactuar con el asistente
+  5. Procesa las consultas del usuario, realiza búsquedas de similitud y genera recomendaciones personalizadas 
+
+  Args:
+      Ninguno
   
+  Returns: 
+      None
+  
+  Raises: 
+      No se anticipan excepciones específicas, pero puede lanzar errores
   """
-  
+
   # cargar tmdb-dataset
   dl_tmdb = DataLoader_TMDB ( )
   
@@ -310,11 +331,6 @@ def llm_assistant ( ) -> None:
   # y otro que usa el LLM para generar las respuesta/recomendaciones y con la característica de chat-history
   llm_with_history_chat = ChatHistory (  )
   llm_with_history_chat.make_chain()
-
-  # results = personalized_vs.similarity_search ( 'Action', 5 )
-
-  
-  response = llm_with_history_chat.to_answer_query( query='Recomiendame 10 peliculas de accion', movies=results )
 
   st.write ( '## RecSys using RAG' )
   # Initialize chat history
@@ -384,9 +400,10 @@ def main () -> None:
   deploy = st.sidebar.selectbox ( 'Seleccione:', page_names_to_funcs.keys(), disabled=False )
   page_names_to_funcs [ deploy ]()
 
+
+
 if __name__ == '__main__':
 
-  # chats ( )
   main ( )
 
 
