@@ -1,36 +1,34 @@
 # Sistemas de Recomendación
 
-## Descripción del repositorio
+## Descripción del Proyecto de Sistemas de Recuperación de Información
 
-Es un proyecto para la asignatura de Sistemas de Recuperación de Información. Este proyecto abarca de conceptos básicos de los sistemas de recomendación como los sistemas de recomendación de filtrado colaborativo basado en items hasta una implementación de sistema de recomendación usando RAG y LLM  
+Este proyecto aborda tanto conceptos fundamentales como avanzados en el campo de los Sistemas de Recomendación. Este proyecto comprende:
+- Sistemas de Recomendación Tradicionales como Sistemas usando Filtrado Colaborativo
+- Sistemas de Recomendación Avanzados como los Sistemas de Recomendación Híbridos y Sistemas de Recomendación utilizando LLM (Large Language Models) con la técnica RAG (Retrieval-Augmented Generation)
+
+Este proyecto integra estos conocimientos, ofreciendo una pequeña visión de la evolución de los Sistemas de Recomendación desde sus raíces hasta innovaciones modernas  
 
 ## Requerimientos 
 
+Algunas de las librerías principales que utiliza nuestro proyecto son las siguientes:
+
+### Librería Surprise
+
+Surprise es una librería diseñada para implementar sistemas de recomendación basados en filtrado colaborativo. Su nombre proviene de "Simple Python Recommendation System Engine" 
+
+Esta ofrece una amplia gama de algoritmos de filtrado colaborativo predefinidos y herramientas para evaluar y comparar su rendimiento. Además de permitir manejar fácilmente conjuntos de datos tanto internos como personalizados. 
+
+### Librería LangChain
+
+LangChain es una librería para facilitar el desarrollo de sistemas de inteligencia artificial, especialmente aquellos que utilizan lenguajes de modelo (LLMs). 
+
+LangChain se centra en proporcionar herramientas y componentes reutilizables para crear aplicaciones de IA, particularmente aquellas que involucran conversaciones, generación de contenido y procesamiento de lenguaje natural
+
 ## Setup Guide
 
-## Descripcion de la base de datos
+1. Ejecutar el comando `pip install -r requirements.txt`
+2. En un archivo `.env` introducir la api key de Google con `google_api_key`, como: `google_api_key='...'`
+3. Ejecutar el comando `streamlit run app.py` 
 
-### MovieLens 
-
-Los conjuntos de datos de MovieLens fueron recopilados por el Proyecto de Investigación GroupLens en la Universidad de Minnesota. 
-
-Este conjunto de datos consta de:
-
-- 100 000 valoraciones (de 1 a 5) de 943 usuarios sobre 1682 películas. 
-- Cada usuario ha valorado al menos 20 películas
-- Se tiene una información demográfica simple para los usuarios: edad, género, ocupación, código postal
-
-Este conjunto de datos ha sido limpiado: se eliminaron los usuarios que tenían menos de 20 valoraciones o no contaban con información demográfica completa. 
-
-| u.data | El conjunto de datos u, con 100 000 valoraciones realizadas por 943 usuarios sobre 1682 elementos. Cada usuario ha valorado al menos 20 películas. Los usuarios y los elementos están numerados consecutivamente desde 1. Los datos están ordenados aleatoriamente. Esta lista está separada por tabulaciones de: id del usuario, id del item, valoración y marcas de tiempo |
-| --- | --- | 
-| u.info | El número de usuarios, items y valoraciones en el conjunto de datos u |
-| u.item | Información sobre los items (películas). Esta lista está separada por tabulaciones de: id de la película, título de la película, ... |
-
-### TMDB 5000 Movies 
-
-## Autores
-
-
-
+Para conseguir la api key de google puedes consultar: https://aistudio.google.com
 
