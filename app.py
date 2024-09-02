@@ -55,14 +55,29 @@ from src.LLM.chat_history import (
 
 def home ( ) -> None:
   """
-  
+  Esta función se encarga de crear y mostrar el contenido de la página principal del proyecto.
+  Presenta una descripción general del proyecto.
+
+  Args:
+      Ninguno
+
+  Returns:
+      None
+
+  Raises:
+      No se anticipan excepciones específicas, pero puede lanzar errores si falla la carga de la imagen.
+
+  Notas:
+      - Utiliza Streamlit para crear el contenido de la página.
+      - Muestra un título y una descripción del proyecto.
+      - Incluye una imagen generada por Canva.
   """
-  
+
   st.markdown ( '''
-  # Proyecto de Sistemas de Recomendación
+  # Proyecto de Sistemas de Recomendación 
   
-  En este proyecto se investigó los diferentes modelos de implementación básicos. Además se presenta como último punto un sistema de recomendación usando como un Modelo Grande de Lenguaje (LLM o Large Language Model)
-  
+  En este proyecto se investigó los diferentes modelos de implementación básicos. 
+  Además se presenta como último punto un sistema de recomendación usando un Modelo Grande de Lenguaje (LLM o Large Language Model) junto con una técnica mejorada para la recuperación de información (RAG)
   ''')
 
   st.image("assets/image-1.png", caption="Foto generada por Canva")
@@ -72,16 +87,26 @@ def home ( ) -> None:
 
 def exploratory_data_analysis ( ) -> None:
   """ 
+  Esta función se encarga de cargar los conjuntos de datos de MovieLens y TMDB 5000 Movies,
+  realizar diferentes análisis estadísticos y algunas visualizaciones para entender mejor la estructura
+  y distribución de los datos.
+
+  Args: 
+      Ninguno
+
+  Returns:
+      None
   
+  Raises:
+      No se anticipan excepciones específicas, pero puede lanzar errores si falla la carga de los datos.
   """
   
   st.markdown ( 
   '''
   ## Análisis Exploratorio de Datos
 
-  El propósito del análsiis exploratorio es tener una idea completa de cómo son nuestros datos, antes de decidir qué técnica usar. Y como en la práctica los datos no son ideales, debemos organizarlos, entender su contenido, entender cuáles son las variables más relevantes y cómo se relacionan unas con otras, comenzar a ver algunos patrones, determinar qué hacer con los datos faltantes y con los datos atípicos, y finalmente extraer conclusiones acerca de todo este análisis. 
-
-
+  El propósito del análisis exploratorio es tener una idea completa de cómo son nuestros datos, antes de decidir qué técnica usar. 
+  Y como en la práctica los datos no son ideales, debemos organizarlos, entender su contenido, entender cuáles son las variables más relevantes y cómo se relacionan unas con otras, comenzar a ver algunos patrones, determinar qué hacer con los datos faltantes y con los datos atípicos, y finalmente extraer conclusiones acerca de todo este análisis. 
   ''' )
 
   # load dataset 
@@ -96,9 +121,8 @@ def exploratory_data_analysis ( ) -> None:
 
   st.markdown ( 
   '''
-  ### Conjunto de Datos de Movielens
+  ### Análisis del Conjunto de Datos de Movielens
   
-  (descripcion del dataset)
   ''' )
 
   st.write ( merge_movilens )
@@ -106,7 +130,7 @@ def exploratory_data_analysis ( ) -> None:
   # ========================================================================================================
   st.markdown ( 
   '''
-  Grafica de Generos de las personas que calificaron
+  Grafica de Géneros de las personas que calificaron
   ''' )
   gender_counts = count_ratings_by_gender ( df=user_set )
 
@@ -144,9 +168,7 @@ def exploratory_data_analysis ( ) -> None:
 
   st.markdown ( 
   '''
-  ### Conjunto de Datos de TMDB 5000 Movies
-
-  (descripcion del dataset)
+  ### Análisis del Conjunto de Datos de TMDB 5000 Movies
   ''' )
   
   st.write ( preprocessed_set )
@@ -182,7 +204,7 @@ def recommendation_models ( ) -> None:
   '''
   ## Modelos de Recomendación
 
-  
+  A continuación se presentan comparaciones y análisis de los modelos tradicionales de sistemas de recomendación usando como conjunto de datos para en entrenamiento y la evaluación Movielens  
 
   '''
   )
