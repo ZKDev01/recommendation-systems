@@ -138,3 +138,4 @@ def count_movies_by_genders_list ( merge: pd.DataFrame, genders: list[str] ) -> 
   for gender in genders:
     result[ gender ] = count_movies_by_genders ( merge, gender )
   return result
+

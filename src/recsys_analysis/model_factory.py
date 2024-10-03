@@ -3,9 +3,10 @@ from surprise import (
   Prediction
 )
 
-from src.Recommendation_Model_Analysis.metrics import Metrics
-from src.Recommendation_Model_Analysis.data_generator import DataGenerator
 
+from src.recsys_analysis.utils import *
+from src.recsys_analysis.metrics import *
+from src.recsys_analysis.data_generator import *
 
 class Model: 
   def __init__(self, model: AlgoBase, name: str) -> None:

@@ -1,6 +1,6 @@
 import os
 
-from src.LLM.utils import get_model, get_embedding 
+from src.llm_components.utils import get_embedding
 
 from typing import List
 

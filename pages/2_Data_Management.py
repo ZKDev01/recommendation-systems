@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd 
 import streamlit as st
 import matplotlib.pyplot as plt
+from typing import List, Dict, Any 
 from surprise import Prediction, KNNBaseline, SVD, KNNWithMeans
 from collections import defaultdict
 
@@ -18,99 +19,91 @@ from src.recsys_analysis.metrics import *
 from src.recsys_analysis.model_factory import *
 from src.recsys_analysis.data_generator import *
 
+@st.cache_resource()
+def dataset ( generate_preprocessing: bool = True ) -> Dict[str,pd.DataFrame]:
+  dl_movielens = DataLoader_Movielens ()
+  dl_tmdb = DataLoader_TMDB ()
+
+  if generate_preprocessing:
+    dl_tmdb.preprocessing_set()
+
+  tmdb_preprocessed = dl_tmdb.load_preprocessed()
+
+  dict_dataset = { 
+    'Movielens Rating Set' : dl_movielens.data_set,
+    'Movielens User Set' : dl_movielens.user_set,
+    'Movielens Item Set' : dl_movielens.item_set,
+    'TMDB Preprocessed Set' : tmdb_preprocessed,
+    'TMDB Movies Set' : dl_tmdb.movies_set
+  }
+
+  return dict_dataset
+
+dict_dataset = dataset()
+
+st.write (dict_dataset['TMDB Preprocessed Set'])
 
 
-st.markdown ( 
-'''
-## Análisis Exploratorio de Datos
 
-El propósito del análisis exploratorio es tener una idea completa de cómo son nuestros datos, antes de decidir qué técnica usar. 
-Y como en la práctica los datos no son ideales, debemos organizarlos, entender su contenido, entender cuáles son las variables más relevantes y cómo se relacionan unas con otras, comenzar a ver algunos patrones, determinar qué hacer con los datos faltantes y con los datos atípicos, y finalmente extraer conclusiones acerca de todo este análisis. 
-''' )
+st.markdown (""" 
+## Manejo y Análisis Exploratorio de los Conjuntos de Datos 
+
+### MOVIELENS
+""")
 
 dl_movielens = DataLoader_Movielens ( )
-dl_tmdb = DataLoader_TMDB ( )
+st.write ("#### RANTING SET")
+st.write (dl_movielens.data_set)
+st.write ("#### ITEM SET")
+st.write (dl_movielens.item_set)
+st.write ("#### USER SET")
+st.write (dl_movielens.user_set)
+st.write ("#### MERGE BY ITEMS")
+merge = dl_movielens.get_merge_by_item_ids()
+st.write (merge)
 
+#! Análisis de Generos
+if st.button ('Análisis de géneros de las personas que calificaron'):
+  labels = 'M', 'F'
+  gender_counts = count_ratings_by_gender ( df=dl_movielens.user_set )
+  sizes = ( gender_counts.iloc[0], gender_counts.iloc[1] )
+  fig, ax = plt.subplots( )
+  ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=['blue', 'red'])
+  st.pyplot ( fig )
 
-merge_movilens = dl_movielens.get_merge_by_item_ids ( )
-data_set = dl_movielens.data_set
-user_set = dl_movielens.user_set
-item_set = dl_movielens.item_set
+#! Count-user-ratings
+if st.button ('Función `count_user_ratings`'):
+  st.write (count_user_ratings)
 
-st.markdown ( 
-'''
-### Análisis del Conjunto de Datos de Movielens
-''' )
+#! Get-top-K-movies
+if st.button ('Función `get_top_K_movies`'):
+  st.write (get_top_K_movies)
 
-st.write ( merge_movilens )
-  
-# =======================================================================================================
-st.markdown ( 
-'''
-Grafica de Géneros de las personas que calificaron
-''' )
-gender_counts = count_ratings_by_gender ( df=user_set )
-
-labels = 'M', 'F'
-sizes = ( gender_counts.iloc[0], gender_counts.iloc[1] )
-
-fig, ax = plt.subplots( )
-ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=['blue', 'red'])
-
-st.pyplot ( fig )
-
-# default values
-grouped = count_user_ratings ( df=data_set, head=10, ascending=True )
-st.write ( grouped )
-
-# ascending = False
-grouped = count_user_ratings ( df=data_set, head=10, ascending=False )
-st.write ( grouped )
-
-# ascending = True, but head = -1 (return fullset)
-grouped = count_user_ratings ( df=data_set, head=-1, ascending=True )
-st.write ( grouped )
-  
-grouped = get_top_K_movies ( df=data_set )
-st.write ( grouped )
-
-grouped = count_people_by_age ( df=user_set )
-st.write ( grouped )
-  
-preprocessed_set = dl_tmdb.get_preprocessed_set ( )
-movies_set = dl_tmdb.get_movies_dataset ( )
-credit_set = dl_tmdb.get_credit_dataset ( )
-  
-merge = movies_set.merge ( credit_set, on='title' )
-
-st.markdown ( 
-'''
-### Análisis del Conjunto de Datos de TMDB 5000 Movies
-''' )
-  
-st.write ( preprocessed_set )
-
-results = count_movies_by_original_language ( merge ).head ( 15 )
-st.write ( results )
-
-results = top_K_movies_by_column ( merge, column='budget', ascending=False, K=10 )
-st.write ( results )
-
-results = top_K_movies_by_column ( merge, column='revenue', ascending=False, K=10 )
-st.write ( results )
-  
-genders = dl_tmdb.get_genders_list ( )
-st.write ( genders )
-
-results = count_movies_by_genders_list ( preprocessed_set, genders )
-st.write ( results )
-
-results = get_movies_by_genders ( preprocessed_set, genders )
-for i in genders:
-  st.write ( i )
-  st.write ( results [ i ] )
+#! Count-people-by-age
+if st.button ('Función `count_people_by_age`'):
+  st.write (count_people_by_age)
 
 
 
-# Raw Data
-# Processed Data
+
+st.markdown (""" 
+### TMDB-5000 MOVIES
+""")
+dl_tmdb = DataLoader_TMDB ()
+#dl_tmdb.preprocessing_set ()
+
+#! Preprocessed-set 
+if st.button ('Load-preprocessed-set'):
+  st.write (dl_tmdb.load_preprocessed())
+
+#! Count-Movies-by-Original-Language
+if st.button ('Función `count_movies_by_original_language`'):
+  st.write (count_movies_by_original_language)
+
+#! top_K_movies_by_column
+
+#! dl_tmdb.get_genders_list
+
+#! get_movies_by_genders (preprocessed-set, genders)
+
+

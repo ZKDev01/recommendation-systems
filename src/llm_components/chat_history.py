@@ -1,11 +1,5 @@
-from src.LLM.utils import (
-  get_model, 
-  get_embedding
-)
-from src.LLM.vectorstore import (
-  Faiss_Vectorstore,
-  Personalized_Vectorstores
-)
+from src.llm_components.utils import *
+from src.llm_components.vectorstore import *
 
 
 from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddings

@@ -1,39 +1,37 @@
 import numpy as np  
 import pandas as pd
-
-from src.Data_Management.utils import (
-    convert,
-    convert_3,
-    director,
-    row_process, 
-    row_to_string
-)
-
 from typing import List
 from itertools import chain
+from src.data_management.utils import *
+
+# region: MOVIELENS DATASET 
+MOVIELENS_PATH = 'dataset/movielens/'
+MOVIELENS_DATA = MOVIELENS_PATH + 'movielens_data.csv'
+MOVIELENS_ITEM = MOVIELENS_PATH + 'movielens_item.csv'
+MOVIELENS_USER = MOVIELENS_PATH + 'movielens_user.csv'
+
+MOVIELENS_PREPROCESSED = MOVIELENS_PATH + 'movielens_preprocessed.csv'
 
 
+# endregion 
 
-# Movielens data path
-MOVIELENS_DATA_PATH = 'dataset/movielens_data.csv'
-MOVIELENS_ITEM_PATH = 'dataset/movielens_item.csv'
-MOVIELENS_USER_PATH = 'dataset/movielens_user.csv'
+# region: TMDB DATASET
+TMDB_PATH = 'dataset/tmdb/'
+TMDB_CREDIT = TMDB_PATH + 'tmdb_5000_credit.csv'
+TMDB_MOVIES = TMDB_PATH + 'tmdb_5000_movies.csv'
 
-# TMDB data path
-TMDB_CREDIT = 'dataset/tmdb_5000_credit.csv'
-TMDB_MOVIES = 'dataset/tmdb_5000_movies.csv'
+TMDB_PREPROCESSED = TMDB_PATH + 'tmdb_preprocessed.csv'
+# endregion
+
 
 
 class DataLoader_Movielens: 
   
-  def __init__(self, 
-    data_path: str = MOVIELENS_DATA_PATH, 
-    item_path: str = MOVIELENS_ITEM_PATH, 
-    user_path: str = MOVIELENS_USER_PATH) -> None:
+  def __init__(self) -> None:
     
-    self.DATA_PATH = data_path
-    self.ITEM_PATH = item_path
-    self.USER_PATH = user_path
+    self.DATA_PATH = MOVIELENS_DATA
+    self.ITEM_PATH = MOVIELENS_ITEM
+    self.USER_PATH = MOVIELENS_USER
 
     self.data_set = self.load_set ( 'DATA' )
     self.item_set = self.load_set ( 'ITEM' )
@@ -41,10 +39,11 @@ class DataLoader_Movielens:
 
   def load_set ( self, name: str ) -> pd.DataFrame:
     """
-    Carga el conjunto de datos correspondiente al nombre proporcionado.
+    Loads the dataset that matches the provided name
 
     Args:
-        name (str) -> Nombre del conjunto de datos (puede ser: 'DATA', 'USER', o 'ITEM')
+        **name** (*str*) 
+        Dataset name (can be: 'DATA', 'USER', or 'ITEM')
 
     Returns:
         pd.DataFrame -> El conjunto de datos cargado como DataFrame
@@ -121,7 +120,7 @@ class DataLoader_Movielens:
     Obtiene información de un usuario por su ID.
 
     Args:
-        id (int) -> ID del usuario
+        id (int) -> User ID
 
     Returns:
         dict -> Información del usuario como diccionario con campos 'userID', 'age', 'gender' y 'occupation'
@@ -263,27 +262,12 @@ class DataLoader_Movielens:
 
 
 class DataLoader_TMDB:
-  def __init__(self, 
-    credit_path: str = TMDB_CREDIT, 
-    movies_path: str = TMDB_MOVIES ) -> None:
-    
-    self.CREDIT_PATH = credit_path
-    self.MOVIES_PATH = movies_path
+  def __init__(self) -> None:
+    self.credit_set = pd.read_csv ( TMDB_CREDIT )
+    self.movies_set = pd.read_csv ( TMDB_MOVIES )
 
-    self.preprocessing_set( )
-
-  def load_set ( self ) -> None:
-    self.credit = pd.read_csv ( self.CREDIT_PATH )
-    self.movies = pd.read_csv ( self.MOVIES_PATH )
-    
-  def get_credit_dataset ( self ) -> pd.DataFrame:
-    return self.credit
-  
-  def get_movies_dataset ( self ) -> pd.DataFrame:
-    return self.movies
-
-
-
+  def load_preprocessed (self):
+    return pd.read_csv (TMDB_PREPROCESSED)
 
   def preprocessing_set ( self, verbose: bool = False ) -> None:
     # type checking: params 
@@ -291,12 +275,11 @@ class DataLoader_TMDB:
       raise TypeError( "Param 'verbose' must be boolean" )
 
     # 1. cargamos el dataframe para el preprocesamiento (por si antes se trabajo de forma malintencionada o si se ejecuta el codigo por segunda vez)
-    self.load_set ( )
 
     # 2. empezar con el preprocesamiento
     
     # merge the both datasets
-    merge = self.movies.merge ( self.credit, on='title' )
+    merge = self.movies_set.merge ( self.credit_set, on='title' )
     
     # check the missing values ( only show if verbose is True )
     if verbose:
@@ -381,22 +364,16 @@ class DataLoader_TMDB:
       print ( '\n\nResults: CREW' )
       print ( merge[['title', 'crew']].head( 10 ) )
 
-    self.preprocessed_set = merge.rename ( columns={ 
-      'title' : 'titulo',
-      'overview' : 'resumen',
-      'cast' : 'actores',
-      'genres' : 'genders',
-      'crew' : 'director',
-      'budget' : 'presupuesto',
-      'revenue' : 'ingresos' 
+    preprocessed_set = merge.rename ( columns={ 
+      'title' : 'Title',
+      'overview' : 'Overview',
+      'cast' : 'Actors',
+      'genres' : 'Genders',
+      'crew' : 'Director',
+      'budget' : 'Budget',
+      'revenue' : 'Revenue' 
     } )
-
-
-
-
-  def get_preprocessed_set ( self ) -> pd.DataFrame:
-    return self.preprocessed_set
-
+    preprocessed_set.to_csv (TMDB_PREPROCESSED, index=False)
 
 
   def convert_preprocessed_set_to_list ( self, dataframe: pd.DataFrame ) -> List[ str ]:
