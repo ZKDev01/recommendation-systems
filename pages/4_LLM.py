@@ -1,33 +1,24 @@
-from collections import defaultdict
-
-import streamlit as st
-import pandas as pd 
 import numpy as np  
-
-from surprise import ( 
-  Prediction,
-  KNNBaseline,
-  SVD,
-  KNNWithMeans
-)
+import pandas as pd 
+import streamlit as st
 
 from src.data_management.utils import *
-from src.data_management.data_loader import *
-from src.data_management.exploratory_data_analysis import *
+from src.data_management.data_loader_movielens import *
 
 from src.llm_components.utils import *
 from src.llm_components.vectorstore import *
 from src.llm_components.chat_history import *
 
 from src.recsys_analysis.utils import *
-from src.recsys_analysis.metrics import *
 from src.recsys_analysis.model_factory import *
-from src.recsys_analysis.data_generator import *
 
 
+st.write ( 'A simple implement of LLMSeqSim (Similaridad Secuencial)' )
+
+comment = """ 
 
 def llm_assistant ( ) -> None:
-  """ 
+  
   Función principal para implementar un asistente de recomendación de películas utilizando un LLM y 
   búsqueda de similitud vectorial. 
 
@@ -47,8 +38,7 @@ def llm_assistant ( ) -> None:
   
   Raises: 
       No se anticipan excepciones específicas, pero puede lanzar errores
-  """
-
+  
   # cargar tmdb-dataset
   dl_tmdb = DataLoader_TMDB ( )
   
@@ -120,3 +110,36 @@ def llm_assistant ( ) -> None:
 
 
 llm_assistant()
+"""
+
+
+prompt_negative_to_positive = """
+Transforma la siguiente consulta en una versión más positiva manteniendo su esencia:
+{query}
+
+Instrucciones:
+1. Identifica las partes negativas de la consulta.
+2. Busca alternativas más positivas para cada parte negativa.
+3. Reemplaza las partes negativas por sus contrapartes positivas.
+4. Mantén la estructura y contexto general de la consulta.
+5. Asegúrate de que la nueva versión sea coherente y gramaticalmente correcta.
+
+Ejemplo:
+original: 'este producto no funciona correctamente'
+positivo: 'este producto tiene algunas limitaciones, pero funciona bien en general'
+
+original: 'me gustan mucho las peliculas de accion'
+positivo: 'me gustan mucho las peliculas de accion'
+
+original: 'no me gustan las peliculas de accion'
+positivo: 'me gustan diferentes generos como comedia y romance'
+
+original: 'no me gustan las peliculas de accion'
+positivo: 'me gustan diferentes generos como romance'
+
+original: 'no me gustan las peliculas de accion'
+positivo: 'me gustan diferentes generos como comedia'
+
+nota: si la consulta ya es principalmente positiva, solo ajusta ligeramente para enfatizar aún más lo positivo.
+"""
+

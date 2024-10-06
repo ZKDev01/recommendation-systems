@@ -1,11 +1,15 @@
 import ast  
 
 
+def str_to_list (s):
+  try: return ast.literal_eval(s)
+  except (ValueError,SyntaxError): return s
+
 def convert ( obj ) -> list: 
   L = [ ]  # empty list
   for i in ast.literal_eval ( obj ):  # this function is used to convert string to list
     i[ 'name' ]
-    L.append( i[ 'name' ] )    # append the name of the genre 
+    L.append( i[ 'name' ] )    
   return L
 
 def convert_3 ( obj ) -> list:
@@ -27,25 +31,16 @@ def director ( obj ) -> list:
       break
   return L
 
-
 def row_process ( row, columns: list[ str ] ) -> list[ str ]:
-  
-  result = [ ]
-  
+  result = [ ]  
   for column in columns: 
     if row[ column ] == 1:
       result.append ( column )
   return result
 
-
 def row_to_string ( row, columns: list[ str ] ) -> str:
-
   result = ''
-
   for col in columns:
     result += col + ' : ' + str(row[col]) + '\n'
-  
   return result
-
-
 

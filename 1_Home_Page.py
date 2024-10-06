@@ -1,37 +1,14 @@
-from collections import defaultdict
-
 import streamlit as st
-import pandas as pd 
-import numpy as np  
 
-from surprise import ( 
-  Prediction,
-  KNNBaseline,
-  SVD,
-  KNNWithMeans
+st.set_page_config(
+  page_title='Home Page',
+  layout='wide'
 )
 
-import matplotlib.pyplot as plt
-
-from src.data_management.utils import *
-from src.data_management.data_loader import *
-from src.data_management.exploratory_data_analysis import *
-
-from src.llm_components.utils import *
-from src.llm_components.vectorstore import *
-from src.llm_components.chat_history import *
-
-from src.recsys_analysis.utils import *
-from src.recsys_analysis.metrics import *
-from src.recsys_analysis.model_factory import *
-from src.recsys_analysis.data_generator import *
-
-
-
+def main () -> None:
+  st.title ('Sistemas de Recomendacion')
+  with st.expander ('**About**'):
+    st.write ('Proyecto de Sistema de Recuperacion de Informacion')
 
 if __name__ == '__main__':
-  st.title ('New Process')
-
-
-
-
+  main ()

@@ -28,18 +28,7 @@ from surprise.prediction_algorithms import AlgoBase
 from sklearn.metrics.pairwise import sigmoid_kernel
 
 
-def get_top_n ( predictions: list[Prediction], user_id: int, n: int = 10 ) -> defaultdict [ Any, list ]:
-  """_summary_
-
-  Args:
-      predictions (list[Prediction]): _description_
-      user_id (int): _description_
-      n (int, optional): _description_. Defaults to 10.
-
-  Returns:
-      defaultdict [ Any, list ]: _description_
-  """
-  
+def get_top_n ( predictions: list[Prediction], user_id: int, n: int = 10 ) -> defaultdict [ Any, list ]:  
   top_n = defaultdict ( list )
 
   for element in predictions:
@@ -54,16 +43,6 @@ def get_top_n ( predictions: list[Prediction], user_id: int, n: int = 10 ) -> de
 
 
 def get_evaluation_and_comparison_of_machine_learning_models ( df: pd.DataFrame, rating_scale=(1,5) ) -> pd.DataFrame:
-  """_summary_
-
-  Args:
-      df (pd.DataFrame): _description_
-      rating_scale (tuple, optional): _description_. Defaults to (1,5).
-
-  Returns:
-      pd.DataFrame: _description_
-  """
-  
   reader = Reader ( rating_scale=rating_scale )
   data = Dataset.load_from_df ( df, reader )
   
@@ -97,4 +76,9 @@ def get_evaluation_and_comparison_of_machine_learning_models ( df: pd.DataFrame,
     benchmark [ algorithm ] = tmp
 
   surprise_results = pd.DataFrame.from_dict ( benchmark ).T
+  surprise_results['Name'] = [ name for name in algorithms.keys() ]
+  surprise_results.to_csv('resources/ml_evaluation.csv',index=False)
+
   return surprise_results
+
+
