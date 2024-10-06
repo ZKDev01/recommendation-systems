@@ -1,34 +1,35 @@
-# Sistemas de Recomendación
+# Recommendation Systems
 
-## Descripción del Proyecto de Sistemas de Recuperación de Información
+## Project Description: Information Retrieval Systems
+This project covers both fundamental and advanced concepts in the field of Recommendation Systems. This project encompasses:
 
-Este proyecto aborda tanto conceptos fundamentales como avanzados en el campo de los Sistemas de Recomendación. Este proyecto comprende:
-- Sistemas de Recomendación Tradicionales como Sistemas usando Filtrado Colaborativo
-- Sistemas de Recomendación Avanzados como los Sistemas de Recomendación Híbridos y Sistemas de Recomendación utilizando LLM (Large Language Models) con la técnica RAG (Retrieval-Augmented Generation)
+- Traditional Recommendation Systems such as Collaborative Filtering-based Systems
+- Advanced Recommendation Systems such as Hybrid Recommendation Systems and those using LLMs (Large Language Models) with the RAG (Retrieval-Augmented Generation) technique
 
-Este proyecto integra estos conocimientos, ofreciendo una pequeña visión de la evolución de los Sistemas de Recomendación desde sus raíces hasta innovaciones modernas  
+This project integrates these knowledge areas, offering a small glimpse into the evolution of Recommendation Systems from their roots to modern innovations
 
-## Requerimientos 
+## Requirements
+Some of the main libraries used in our project are as follows:
 
-Algunas de las librerías principales que utiliza nuestro proyecto son las siguientes:
+### Surprise Library
+Surprise is a library designed to implement recommendation systems based on collaborative filtering. Its name comes from "Simple Python Recommendation System Engine"
 
-### Librería Surprise
+It offers a wide range of predefined collaborative filtering algorithms and tools for evaluating and comparing their performance. Additionally, it allows easy handling of both internal and custom datasets.
 
-Surprise es una librería diseñada para implementar sistemas de recomendación basados en filtrado colaborativo. Su nombre proviene de "Simple Python Recommendation System Engine" 
+### LangChain Library
+LangChain is a library to facilitate the development of artificial intelligence systems, especially those using model languages (LLMs).
 
-Esta ofrece una amplia gama de algoritmos de filtrado colaborativo predefinidos y herramientas para evaluar y comparar su rendimiento. Además de permitir manejar fácilmente conjuntos de datos tanto internos como personalizados. 
-
-### Librería LangChain
-
-LangChain es una librería para facilitar el desarrollo de sistemas de inteligencia artificial, especialmente aquellos que utilizan lenguajes de modelo (LLMs). 
-
-LangChain se centra en proporcionar herramientas y componentes reutilizables para crear aplicaciones de IA, particularmente aquellas que involucran conversaciones, generación de contenido y procesamiento de lenguaje natural
+LangChain focuses on providing tools and reusable components to create AI applications, particularly those involving conversations, content generation, and natural language processing.
 
 ## Setup Guide
 
-1. Ejecutar el comando `pip install -r requirements.txt`
-2. En un archivo `.env` introducir la api key de Google con `google_api_key`, como: `google_api_key='...'`
-3. Ejecutar el comando `streamlit run app.py` 
+1. Run the command `pip install -r requirements.txt`
+2. In a `.env` file, enter the Google API key with `google_api_key`, like: `google_api_key='...'`
+3. Run the command `streamlit run app.py`
 
-Para conseguir la api key de google puedes consultar: https://aistudio.google.com
+To obtain the Google API key, please consult: https://aistudio.google.com
 
+## Authors
+
+- Raimel D. Romaguera Puig
+- Manuel Alejandro Gamboa Hernández

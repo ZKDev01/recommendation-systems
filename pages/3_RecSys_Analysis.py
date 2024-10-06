@@ -48,11 +48,11 @@ def prepare_hybrid_rec_system_models (df:pd.DataFrame) -> HybridModel_Weighted:
 
   # 1. Hybrid for filtrer recommendation-list
   model_svd = Model(
-    model=SVD(), # TODO: user-based = True
+    model=SVD(), 
     name='SVD'
   )
   model_baseline_only = Model(
-    model=BaselineOnly(),  # TODO: user-based = False
+    model=BaselineOnly(),  
     name='Baseline Only' 
   )
   model_svd.evaluate(data=data_generator)
