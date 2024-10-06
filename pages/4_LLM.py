@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 
 from src.data_management.utils import *
+from src.data_management.data_loader_tmdb import *
 from src.data_management.data_loader_movielens import *
 
 from src.llm_components.utils import *
@@ -13,133 +14,141 @@ from src.recsys_analysis.utils import *
 from src.recsys_analysis.model_factory import *
 
 
-st.write ( 'A simple implement of LLMSeqSim (Similaridad Secuencial)' )
+st.set_page_config(
+  page_title='RecSys using LLM',
+  layout='wide'
+)
 
-comment = """ 
 
-def llm_assistant ( ) -> None:
+# region: CACHE
+
+@st.cache_resource()
+def load_dataset ( generate_preprocessing:bool=False ) -> Dict[str,pd.DataFrame]:
+  dl_movielens = DataLoader_Movielens ()
+  dl_tmdb = DataLoader_TMDB ()
+
+  if generate_preprocessing:
+    dl_tmdb.preprocessing_set()
+
+  movielens_merge = dl_movielens.get_merge_by_item_ids()
+  tmdb_preprocessed = dl_tmdb.load_preprocessed()
+  tmdb_tags_set =  dl_tmdb.create_tags_for_preprocessed_set()
+
+  dict_dataset = { 
+    'movielens-rating-set' : dl_movielens.data_set,
+    'movielens-user-set' : dl_movielens.user_set,
+    'movielens-item-set' : dl_movielens.item_set,
+    'movielens-merge' : movielens_merge,
+    'TMDB-preprocessed-set' : tmdb_preprocessed,
+    'TMDB-movies-set' : dl_tmdb.movies_set,
+    'TMDB-tags-set': tmdb_tags_set
+  }
+  return dict_dataset
+
+@st.cache_resource()
+def compute_similarity (df:pd.DataFrame):
+  vectors = get_vectors_from_tags(df)
+  similarity = calculate_cosine_similarity_between_vectors(vectors)
+  return similarity
+
+@st.cache_resource()
+def convert_columns_to_str (df:pd.DataFrame) -> pd.DataFrame:
+  df_tmdb_str = convert_preprocessed_set_to_list(df=df)
+  return df_tmdb_str
+
+# endregion 
+
+def get_str_from_title_name (df:pd.DataFrame,title:str) -> str:
+  result = df[ df['Title'] == title ]
+  output:str = f"""
+  **Title**: {result['Title'].iloc[0]} \n
+  **Overview**: {result['Overview'].iloc[0]} \n
+  **Director**: { ', '.join(result['Director'].iloc[0]) } \n
+  **Genres**: { ', '.join(result['Genres'].iloc[0]) } \n
+  **Actors**: { ', '.join(result['Actors'].iloc[0]) } \n
+  **Budget**: {result['Budget'].iloc[0]} \n
+  **Revenue**: {result['Revenue'].iloc[0]}
+  """ 
+  return output
+
+
+
+st.title ('Recommendation System using LLM and RAG')
+
+with st.expander(label='**About**'):
+  st.markdown(
+    """
+    The TMDB 5000 Movies is used on this page
+
+    In this page include:
+
+    - *LLM Seq Sim Implementation*: Generates semantic item embeddings using Large Language Models (LLMs)
+    - *RAG*: Retrieves relevant information from a knowledge base to augment LLM embeddings
+    """
+  )
+
+
+
+# load datasets
+dict_dataset = load_dataset()
+
+df_tmdb_preprocessed = dict_dataset['TMDB-preprocessed-set']
+df_tmdb_tags_set = dict_dataset['TMDB-tags-set']
+
+similarity = compute_similarity(df_tmdb_tags_set)
+
+chat_history = ChatHistory()
+
+
+
+# Inputs
+col1_1,col1_2 = st.columns([4,3])
+with col1_1:
+  selection = st.multiselect(label='Historial',options=df_tmdb_tags_set['Title'])
+with col1_2:
+  query = st.text_input(label='Query')
+
+
+
+# Buttons
+btn_recommend = st.button ('Recommend')
+
+
+
+# Show answer y process the inputs
+if btn_recommend and len(selection) > 0 and len(query) > 0:
+  recommendation:set = set()
+  recommendation.update (selection)
+  for s in selection:
+    recommendation.update (recommend (df=df_tmdb_tags_set, title=s, similarity=similarity, k=20))
   
-  Función principal para implementar un asistente de recomendación de películas utilizando un LLM y 
-  búsqueda de similitud vectorial. 
-
-  Esta función realiza las siguientes tareas:
-
-  1. Carga y preprocesa el conjunto de datos de películas de TMDB.
-  2. Crea bases de datos vectoriales personalizadas para cada género de película 
-  3. Inicializa un chat con historial utilizando un LLM
-  4. Implementa una interfaz de usuario en Streamlit para interactuar con el asistente
-  5. Procesa las consultas del usuario, realiza búsquedas de similitud y genera recomendaciones personalizadas 
-
-  Args:
-      Ninguno
+  #st.write (query)
+  #st.write (len(recommendation))
   
-  Returns: 
-      None
-  
-  Raises: 
-      No se anticipan excepciones específicas, pero puede lanzar errores
-  
-  # cargar tmdb-dataset
-  dl_tmdb = DataLoader_TMDB ( )
-  
-  # obtener el conjunto de datos preprocesado 
-  preprocessed_set = dl_tmdb.get_preprocessed_set ( )
-  
-  # obtener la lista de generos para filtrar con el conjunto de datos preprocesado 
-  genders = dl_tmdb.get_genders_list ( )
-  
-  # obtenemos las peliculas separadas por generos 
-  results = count_movies_by_genders_list ( preprocessed_set, genders )
-  movies: dict = get_movies_by_genders ( preprocessed_set, genders )
-  
-  genders = genders[ 0:5 ]
+  col2_1,col2_2,col2_3 = st.columns([1,1,1])
+  with col2_1:
+    st.write (f"Total: {len(recommendation)}")
 
-  # obtenemos por cada tupla del dataframe una cadena de texto
-  for i in genders:
-    movies[ i ] = dl_tmdb.convert_preprocessed_set_to_list( dataframe=movies[ i ] )
+    dict_title_tags = { title:', '.join(df_tmdb_tags_set[ df_tmdb_tags_set['Title'] == title ]['Tags'].iloc[0]) for title in recommendation }
+    for title in dict_title_tags.keys():
+      with st.expander (label=f"**Movie**: {title}"):
+        st.markdown (get_str_from_title_name(df_tmdb_preprocessed,title))
 
-  # aqui estaran almacenadas las bases de datos vectoriales (cada una correspondera a un genero) 
-  vectorstore : list[ Faiss_Vectorstore ] = [ ]
-
-  for i in genders:
-    if results[i] <= 100:
-      vectorstore.append ( Faiss_Vectorstore ( 
-        movies=movies[ i ], 
-        description=i
-      ) )
-    else:
-      vectorstore.append ( Faiss_Vectorstore (
-        movies=movies[ i ][ 0:100 ],
-        description=i
-      ) )
-
-  # finalmente tenemos un objeto que contiene todas las bases de datos vectoriales
-  personalized_vs = Personalized_Vectorstores ( vectorstore )  
-  # y otro que usa el LLM para generar las respuesta/recomendaciones y con la característica de chat-history
-  llm_with_history_chat = ChatHistory (  )
-  llm_with_history_chat.make_chain()
-
-  st.write ( '## RecSys using RAG' )
-  # Initialize chat history
-  if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-  # Display chat messages from history on app rerun
-  for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-      st.markdown(message["content"])
-
-  # React to user input
-  if prompt := st.chat_input("What is up?"):
-    # Display user message in chat message container
-    st.chat_message("user").markdown(prompt)
-    # Add user message to chat history
-    st.session_state.messages.append({"role": "user", "content": prompt})
-
-    # MAGIC HERE
-    results_of_similarity_search = personalized_vs.similarity_search ( prompt, 5 )
+  with col2_2:
     
-    prompt = llm_with_history_chat.to_answer_query ( query=prompt, movies=results_of_similarity_search )
+    faiss = Faiss_Vectorstore(movies=dict(list(dict_title_tags.items())[:50]))
+    result:List[Document] = faiss.similarity_search(query=query,k=10)
+    
+    st.write ('**Movies similar to the query**')
+    for document in result:
+      title:str = document.metadata['Title']
+      with st.expander (label=f"**Movie**: {title}"):
+        st.markdown (get_str_from_title_name(df_tmdb_preprocessed,title))
 
-    response = f"IA: {prompt}"
-    # Display assistant response in chat message container
-    with st.chat_message("assistant"):
-      st.markdown(response)
-    # Add assistant response to chat history
-    st.session_state.messages.append({"role": "assistant", "content": response})
-
-
-llm_assistant()
-"""
-
-
-prompt_negative_to_positive = """
-Transforma la siguiente consulta en una versión más positiva manteniendo su esencia:
-{query}
-
-Instrucciones:
-1. Identifica las partes negativas de la consulta.
-2. Busca alternativas más positivas para cada parte negativa.
-3. Reemplaza las partes negativas por sus contrapartes positivas.
-4. Mantén la estructura y contexto general de la consulta.
-5. Asegúrate de que la nueva versión sea coherente y gramaticalmente correcta.
-
-Ejemplo:
-original: 'este producto no funciona correctamente'
-positivo: 'este producto tiene algunas limitaciones, pero funciona bien en general'
-
-original: 'me gustan mucho las peliculas de accion'
-positivo: 'me gustan mucho las peliculas de accion'
-
-original: 'no me gustan las peliculas de accion'
-positivo: 'me gustan diferentes generos como comedia y romance'
-
-original: 'no me gustan las peliculas de accion'
-positivo: 'me gustan diferentes generos como romance'
-
-original: 'no me gustan las peliculas de accion'
-positivo: 'me gustan diferentes generos como comedia'
-
-nota: si la consulta ya es principalmente positiva, solo ajusta ligeramente para enfatizar aún más lo positivo.
-"""
-
+  with col2_3:
+    st.write ('**To answer query using LLM**')
+    
+    movies = [ get_str_from_title_name(df_tmdb_preprocessed,document.metadata['Title']) for document in result ]
+    answer = chat_history.to_process_query(query=query,movies=movies,record=selection)
+    st.write (answer)
+  

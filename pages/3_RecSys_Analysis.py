@@ -10,6 +10,13 @@ from src.data_management.data_loader_movielens import *
 from src.recsys_analysis.utils import *
 from src.recsys_analysis.model_factory import *
 
+
+st.set_page_config(
+  page_title='RecSys Analysis',
+  layout='wide'
+)
+
+
 # region: CACHE
 
 @st.cache_resource()
@@ -132,12 +139,26 @@ id_to_name, name_to_id = read_item_names(item_set)
 
 
 
-markdown = """
+st.title ('Analysis of Recommendation Systems')
 
+markdown = """
+A recommendation system is a tool that establishes a set of assessments on user data 
+to make predictions about recommendations of items that may be useful or valuable to the user.
 """
 st.markdown(markdown)
 
+with st.expander(label='**About**'):
+  st.markdown(
+    """
+    The dataset Movielens is used on this page
 
+    In this page include:
+
+    - *Hybrid Recommendation System*: Implements a hybrid recommendation model combining SVD and Baseline Only models
+    - *KNN-based Recommendation*: Prepares a KNN (K-Nearest Neighbors) model for item-based recommendations
+    - *Evaluation of Recommendation Systems*: Displays evaluation results of machine learning models for recommendation tasks. 
+    """
+  )
 
 # Config Options
 options = name_to_id.keys()
@@ -157,8 +178,8 @@ with col1_2:
 col2_1,col2_2 = st.columns([1,1])
 with col2_1:
   
-  if btn_search_neighbors:
-    s_neighbors:Dict = { s: get_neighbors(model=knn,item_id=name_to_id[s],k=selection_k) for s in selection }
+  if btn_search_neighbors and len(selection) > 0:
+    s_neighbors:Dict = { s: get_neighbors(model=knn,item_id=name_to_id[s],k=10) for s in selection }
     merge:Set = set()
     for _,neighbors in s_neighbors.items():
       merge.update(neighbors)
@@ -177,18 +198,3 @@ with col2_2:
   if btn_show_evaluation:
     st.write (evaluations[ ['Name','Test RMSE', 'Fit Time'] ])
 
-
-
-more_comment = """
-# TODO
-#! Preprocessed-set Display
-st.write (df_tmdb_preprocessed_set)
-st.write (df_tmdb_tags_set)
-
-movie_recommend = recommend (df=df_tmdb_tags_set, title='Cars', similarity=dict_resources['similarity'])
-
-st.write (movie_recommend)
-# Tomar todas las option de df-title-movies y seleccionar para pasarla y que recomiende segun la similitud entre peliculas 
-# esto se puede entender como un recomnedador sencillo
-
-"""

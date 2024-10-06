@@ -72,10 +72,7 @@ class DataLoader_TMDB:
 
     preprocessed_set.to_csv (TMDB_PREPROCESSED, index=False)
 
-  def convert_preprocessed_set_to_list ( self, dataframe: pd.DataFrame ) -> List[ str ]:
-    dataframe [ 'text' ] = dataframe.apply ( lambda row: row_to_string ( row, columns=dataframe.columns ), axis=1 )
-    return dataframe [ 'text' ].values.tolist ( )
-
+  
   def create_tags_for_preprocessed_set (self) -> pd.DataFrame:
     preprocessed_set = self.load_preprocessed()
     preprocessed_set['Tags'] = preprocessed_set['Actors'] + preprocessed_set['Genres'] + preprocessed_set['Director'] + preprocessed_set['Keywords'] + preprocessed_set['Overview'].str.split()
@@ -83,6 +80,10 @@ class DataLoader_TMDB:
 
 
 
+def convert_preprocessed_set_to_list ( df: pd.DataFrame ) -> List[ str ]:
+  result = df[['Title','id']]
+  result['Text'] = df.apply ( lambda row: row_to_string ( row, columns=df.columns ), axis=1 )
+  return result
 
 def get_genders_list (df:pd.DataFrame) -> List[str]:
   genders:List = df['Genres'].explode().unique().tolist()
@@ -114,10 +115,10 @@ def calculate_cosine_similarity_between_vectors (vectors: Any) -> None:
   similarity = cosine_similarity (vectors)
   return similarity
 
-def recommend (df: pd.DataFrame, title: str, similarity: Any) -> List[str]:
+def recommend (df: pd.DataFrame, title: str, similarity: Any, k:int = 10) -> List[str]:
   index = df[ df['Title']==title ].index[0]
   distances = similarity[index]
-  movies = sorted (list(enumerate(distances)), reverse=True, key=lambda x:x[1])[1:6]
+  movies = sorted (list(enumerate(distances)), reverse=True, key=lambda x:x[1])[:k]
   result = [ ]
   for i in movies:
     # Extract more information from df (generate a new df)
